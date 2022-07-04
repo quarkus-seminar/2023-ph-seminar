@@ -75,8 +75,10 @@
 
 Lab 7: gh-actions mit Deployment in minikube
 
+== TODO
 
-
+* Kleine Aufgaben zu jedem Kapitel überlegen
+* Hilferessourcen zusammenstellen (Link-Sammlung)
 
 
 
