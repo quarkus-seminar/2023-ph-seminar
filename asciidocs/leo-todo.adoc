@@ -1,0 +1,646 @@
+= leo-todo
+C.Aberger & T.Stütz
+1.0.0, {docdate}: Quarkus Schulung
+ifndef::imagesdir[:imagesdir: images]
+//:toc-placement!:  // prevents the generation of the doc at this position, so it can be printed afterwards
+:sourcedir: ../src/main/java
+:icons: font
+:experimental:
+:sectnums:    // Nummerierung der Überschriften / section numbering
+:toc: left
+
+// print the toc here (not at the default position)
+//toc::[]
+
+== Precondition
+
+* Docker should be installed.
+
+<<<
+
+== Create the Project
+
+.quarkus.io -> START CODING
+image::quarkusio-get-started.png[]
+
+* Folgende Libraries werden ausgewählt:
+** RESTEasy Reactive Jackson
+** JDBC Driver - PostgreSQL (NICHT reaktiv)
+** Hibernate ORM with Panache
+** Flyway
+** SmallRye OpenAPI
+
+
+IMPORTANT: https://code.quarkus.io/?g=at.htl&a=leo-todo&e=resteasy-reactive-jackson&e=jdbc-postgresql&e=hibernate-orm-panache&e=flyway&e=smallrye-openapi&extension-search=origin:platform%20openapi[Quick Link for Project Generation^]
+
+=== Variante 1 - download the zip
+
+** kbd:[Generate your application]
+
+** kbd[DOWNLOAD THE ZIP]
+
+** Extract the zip
+
+** cd leo-todo
+
+** open project in IDE
+
+=== Variante 2 - use a git repo
+
+==== Push to git-repo
+
+image::quarkusio-push-to-github.png[]
+
+image::quarkusio-github-info.png[]
+
+==== Clone git-repo
+
+image::intellij-community-startscreen.png[]
+
+.copy the url into the clipboard
+image::github-repo-todo.png[]
+
+.paste url in intellij-form
+image::intellij-get-from-vcs.png[]
+
+image::intellij-trust-project.png[]
+
+
+== Quarkus Configuration
+
+=== pom.xml
+
+.pom.xml
+[%collapsible]
+====
+[source,xml]
+----
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>at.htl</groupId>
+  <artifactId>leo-todo</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <properties>
+    <compiler-plugin.version>3.8.1</compiler-plugin.version>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+    <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+    <quarkus.platform.version>2.13.2.Final</quarkus.platform.version>
+    <skipITs>true</skipITs>
+    <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>${quarkus.platform.group-id}</groupId>
+        <artifactId>${quarkus.platform.artifact-id}</artifactId>
+        <version>${quarkus.platform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-reactive-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-flyway</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-openapi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-hibernate-orm-panache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jdbc-postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-arc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-reactive</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>${quarkus.platform.group-id}</groupId>
+        <artifactId>quarkus-maven-plugin</artifactId>
+        <version>${quarkus.platform.version}</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build</goal>
+              <goal>generate-code</goal>
+              <goal>generate-code-tests</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${compiler-plugin.version}</version>
+        <configuration>
+          <compilerArgs>
+            <arg>-parameters</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire-plugin.version}</version>
+        <configuration>
+          <systemPropertyVariables>
+            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+            <maven.home>${maven.home}</maven.home>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${surefire-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <systemPropertyVariables>
+                <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                <maven.home>${maven.home}</maven.home>
+              </systemPropertyVariables>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>native</id>
+      <activation>
+        <property>
+          <name>native</name>
+        </property>
+      </activation>
+      <properties>
+        <skipITs>false</skipITs>
+        <quarkus.package.type>native</quarkus.package.type>
+      </properties>
+    </profile>
+  </profiles>
+</project>
+----
+====
+
+=== application.properties
+
+* it's empty, at the moment
+
+.application.properties
+image::application-properties.png[]
+
+
+=== Project Structure
+
+* Es ist nicht notwendig auf der Maschine eine jdk zu installieren (aber durchaus sinnvoll)
+
+.Define a JDK
+[%collapsible]
+====
+
+.click kbd:[+]
+image::add-jdk-01.png[]
+
+.choose a jdk
+image::add-jdk-02.png[]
+
+.click kbd:[Download]
+image::add-jdk-03.png[]
+
+.choose the JDK
+image::add-jdk-04.png[]
+
+
+====
+
+=== Maven
+
+* Man kann sich https://maven.apache.org/download.cgi[maven^] auf der Maschine installieren.
+* In Quarkus ist jedoch ein https://maven.apache.org/wrapper/[maven-wrapper^] installiert.
+** Somit hat jedes Projekt maven in der richtigen Version
+** Man ist unabhängig von der Version des ev. installierten mavens
+** Das ist wichtig, wenn man auf eine Maschine mit veraltetem maven arbeitet und keine Rechte zum updaten hat (zB Schul-PC) und man nicht extra ein maven downloaden und konfigurieren will
+
+
+=== IntelliJ Plugins
+
+==== Docker
+
+.File (oder apple-menü) - Preferences -> Plugins -> Marketplace -> Docker -> kbd:[Install]
+image::docker-plugin.png[]
+
+==== plantuml
+
+==== Asciidoctor
+
+=== Preferences
+
+==== Add Unambiguous Dependencies
+
+[%collapsible]
+====
+image::prefs-add-unambiguous-deps.png[]
+====
+
+==== Change Font size
+
+[%collapsible]
+====
+image::prefs-change-font-size.png[]
+====
+
+==== Add Staging Area
+
+[%collapsible]
+====
+image::prefs-add-staging-area.png[]
+====
+
+== First Run
+
+=== Change Example Code
+
+.kbd:[shift]-kbd:[F6] for renaming
+image::rename-todoresource-01.png[]
+
+.renames also the tests
+image::rename-todoresource-02.png[]
+
+=== Start App
+
+[source,shell]
+----
+./mvnw clean quarkus:dev
+----
+
+.open a terminal window
+image::first-run-01.png[]
+
+.the logs show the state of the app
+image::first-run-02.png[]
+
+.the Dev Services started a testcontainer with a postgres-db (docker-container)
+image::first-run-03-devservices.png[]
+
+===
+
+=== Open Browser
+
+.click into the terminal window
+|===
+|Keyboard Shortcut |Description
+
+|kbd:[w]
+| Open the application in a browser
+
+|kbd:[d]
+| Open the Dev UI in a browser
+
+|===
+
+
+image:open-browser-from-terminal.png[]
+
+.add `/hello` to url
+image::open-rest-resource.png[]
+
+
+=== Aufgabe
+
+* Editieren Sie die Resource im Code wie folgt:
++
+[source,java]
+----
+package at.htl;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("/hello")
+public class TodoResource {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello from HTL Leonding"; // <.>
+    }
+}
+----
+
+<.> use "HTL Leonding"
+
+* wechseln Sie zum Browser und klicken Sie image:btn-reload.png[] (reload).
+
+image::first-run-04.png[]
+
+=== Add new Endpoint
+
+[source,java]
+----
+@GET
+@Produces(MediaType.TEXT_PLAIN)
+@Path("{name}")
+public String hello(@PathParam("name") String name) {
+    return String.format("Hello %s", name);
+}
+----
+
+
+.add "/Leonie" to the url
+image::first-run-05.png[]
+
+
+=== Add Entity Class
+
+TIP: source: https://github.com/cescoffier/quarkus-todo-app[^]
+
+.at.htl.Todo.java
+[source,java]
+----
+package at.htl;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
+import javax.persistence.Column;
+
+public class Todo extends PanacheEntity {
+
+    @Column(unique = true)
+    public String title;
+
+    public boolean completed;
+
+    public String url;
+
+    @Column(name = "ordering")
+    public int order;
+}
+----
+
+.at.htl.TodoResource.java
+[source,java]
+----
+package at.htl;
+
+import io.quarkus.panache.common.Sort;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import java.util.List;
+
+@Path("/api")
+public class TodoResource {
+
+    @GET
+    public List<Todo> list() {
+        return Todo.listAll(Sort.ascending("order"));
+    }
+
+}
+----
+
+* press kbd:[s] in terminal to restart app
+
+
+image::empty-todo-list.png[]
+
+
+== Continuous Testing
+
+* Press kbd:[r] for Continuous Testing
+
+* immediately an error occurs
+** we didn't change the existing tests to the new code.
+
+image::cont-testing-01.png[]
+
+* A second testcontainer was startet (test-profile), so the data in the dev-profile is not affected.
+
+image::cont-testing-02-second-testcontainer.png[width=400]
+
+
+.we are using test-driven-development
+image::test-driven-development.png[]
+
+=== Write all tests
+
+.at.htl.TodoResourceTest
+[source,java]
+----
+package at.htl;
+
+import ...
+
+@QuarkusTest
+public class TodoResourceTest {
+
+    public static final String PREPARE_TALK_FOR_SCHILF_HTL_LEONDING = "Prepare talk for SCHILF @ HTL Leonding";
+    long todoId;
+
+    @BeforeEach
+    @Transactional
+    public void setup() {
+        Todo.deleteAll();
+        Todo t = new Todo();
+        t.title = PREPARE_TALK_FOR_SCHILF_HTL_LEONDING;
+        t.order = 1;
+        t.persistAndFlush();
+        todoId = t.id;
+    }
+
+    @Test
+    public void testList() {
+        given()
+          .when().get("/api")
+          .then()
+             .statusCode(200)
+             .body("[0].title",is(PREPARE_TALK_FOR_SCHILF_HTL_LEONDING));
+    }
+
+    @Test
+    public void testAdd() {
+        given()
+                .body(Map.of("title", "Added", "order", "2"))
+                .contentType(ContentType.JSON)
+                .when().post("/api")
+                .then()
+                .statusCode(200)
+                .body("title", is("Added"));
+
+        given()
+                .when().get("/api")
+                .then()
+                .statusCode(200)
+                .body("[0].title",is(PREPARE_TALK_FOR_SCHILF_HTL_LEONDING))
+                .body("[1].title",is("Added"));
+    }
+
+    @Test
+    public void testEdit() {
+        given()
+                .body(Map.of("title", "Edited"))
+                .contentType(ContentType.JSON)
+                .when().patch("/api/" + todoId)
+                .then()
+                .statusCode(200)
+                .body("title", is("Added"));
+
+        given()
+                .when().get("/api")
+                .then()
+                .statusCode(200)
+                .body("[0].title",is("Edited"));
+    }
+
+    @Test
+    public void testDelete() {
+        given()
+                .when().delete("/api/" + todoId)
+                .then()
+                .statusCode(204);
+
+        given()
+                .when().get("/api")
+                .then()
+                .statusCode(200)
+                .body("size()",is(0));
+    }
+
+}
+----
+
+.3 tests fail
+image::tdd-tests-fail-01.png[]
+
+
+== Write Endpoints
+
+[source,java]
+----
+@POST
+@Transactional
+public Todo add(Todo todo) {
+     todo.persistAndFlush();
+     return todo;
+}
+----
+
+.2 tests fail
+image::tdd-tests-fail-02.png[]
+
+TIP: Why do we use `persistAndFlush`?
+Because so it is possible to catch exceptions when writing to the database when the transaction is committed.
+
+
+
+////
+.database content
+image::tdd-db-content-03.png[]
+////
+
+
+[source,java]
+----
+@PATCH
+@Transactional
+@Path("{id}")
+public Todo edit(
+        @PathParam("id") long id,
+        Todo todo
+) {
+    Todo existing = Todo.findById(id);
+    existing.title = todo.title;
+    existing.order = todo.order;
+    existing.completed = todo.completed;
+    existing.persistAndFlush();
+    return todo;
+}
+----
+
+
+image::tdd-tests-fail-03.png[]
+
+
+image::tdd-tests-fail-04.png[]
+
+
+[source,java]
+----
+@DELETE
+@Transactional
+@Path("{id}")
+public void delete(@PathParam("id") long id) {
+    Todo.findById(id).delete();
+}
+----
+
+
+image::tdd-tests-fail-05.png[]
+
+link::website.zip[]
+
+
+== Website
+
+* Download link:website.zip[] and
+* move the files into `src/main/resources/META-INF/resources`
+* open with http://localhost:8080/todo.html[^]
+
+image::website.png[]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

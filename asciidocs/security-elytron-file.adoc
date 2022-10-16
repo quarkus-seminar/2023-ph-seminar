@@ -1,0 +1,607 @@
+= Quarkus - Security with Elytron (Files)
+Thomas Stütz
+1.0.0, 2022-07-30: Lecture Notes for Courses at HTL Leonding
+ifndef::imagesdir[:imagesdir: images]
+//:toc-placement!:  // prevents the generation of the doc at this position, so it can be printed afterwards
+ifndef::sourcedir-code[:sourcedir-code: ../labs/openid-connect-policies/src/main/java/at/htl]
+ifndef::sourcedir-test[:sourcedir-test: ../labs/openid-connect-policies/src/test/java/at/htl]
+:icons: font
+:sectnums:    // Nummerierung der Überschriften / section numbering
+:toc: left
+:toclevels: 5
+:experimental: // for displaying the keyboard-icons
+:linkattrs:   // so window="_blank" will be executed
+
+//Need this blank line after ifdef, don't know why...
+ifdef::backend-html5[]
+
+icon:file-text-o[link=https://raw.githubusercontent.com/htl-leonding-college/quarkus-security-lecture-notes/master/asciidocs/{docname}.adoc] ‏ ‏ ‎
+icon:github-square[link=https://github.com/htl-leonding-college/quarkus-security-lecture-notes] ‏ ‏ ‎
+icon:home[link=https://htl-leonding-college.github.io/quarkus-security-lecture-notes/]
+endif::backend-html5[]
+
+
+
+
+== Create Project
+
+[source,bash]
+----
+mvn io.quarkus.platform:quarkus-maven-plugin:2.11.1.Final:create \
+    -DprojectGroupId=at.htl.elytronfile \
+    -DprojectArtifactId=security-elytron-file \
+    -Dextensions="resteasy,resteasy-jackson"
+cd security-elytron-file
+----
+
+
+
+
+== Configure Security
+
+.Add dependency for Elytron Security Properties File
+[source,bash]
+----
+./mvnw quarkus:add-extension -Dextensions="io.quarkus:quarkus-elytron-security-properties-file"
+----
+
+https://quarkus.io/guides/security-properties[Guide: Using Security with .properties File^]
+
+.src/main/resources/application.properties
+[source,properties]
+----
+quarkus.security.users.file.enabled=true
+quarkus.security.users.file.users=my-users.properties
+quarkus.security.users.file.roles=my-roles.properties
+quarkus.security.users.file.realm-name=MyRealm
+quarkus.security.users.file.plain-text=true
+----
+
+
+.src/main/resources/my-users.properties
+[source,properties]
+----
+susi=passme
+hansi=passme
+----
+
+.src/main/resources/my-roles.properties
+[source,properties]
+----
+susi=admin,user
+hansi=user
+----
+
+
+== Endpoint erstellen
+
+[source,java]
+----
+@Path("api")
+public class VehicleEndpoint {
+
+    @RolesAllowed("user")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Vehicle> allVehicles() {
+        return Arrays.asList(
+            new Vehicle("Horch","P 240"),
+            new Vehicle("Tucker","'48"),
+            new Vehicle("BMW","Isetta")
+        );
+    }
+
+    @RolesAllowed("admin")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("admin")
+    public String onlyAdmin() {
+        return "You are admin!";
+    }
+
+}
+----
+
+== Auf Endpoint zugreifen
+
+.with IntelliJ-Rest-Client
+[source,httprequest]
+----
+GET http://localhost:8080/api
+
+###
+
+GET http://localhost:8080/api
+Authorization: Basic hansi passme
+
+----
+
+.request 1
+[source,text]
+----
+http://localhost:8080/api
+
+HTTP/1.1 401 Unauthorized
+www-authenticate: basic realm="Quarkus"
+content-length: 0
+
+<Response body is empty>
+----
+
+.request 2
+[source,text]
+----
+http://localhost:8080/api
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+content-length: 101
+
+[
+  {
+    "brand": "Horch",
+    "model": "P 240"
+  },
+  {
+    "brand": "Tucker",
+    "model": "'48"
+  },
+  {
+    "brand": "BMW",
+    "model": "Isetta"
+  }
+]
+----
+
+== Tests erstellen
+
+[source,java]
+----
+package at.htl.elytronfile.boundary;
+
+import at.htl.elytronfile.entity.dto.VehicleDto;
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.*;
+
+import java.util.List;
+
+import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@QuarkusTest
+class VehicleEndpointTest {
+
+    static VehicleDto horch = new VehicleDto("Horch", "P 240");
+    static VehicleDto tucker = new VehicleDto("Tucker", "'48");
+    static VehicleDto bmw = new VehicleDto("BMW", "Isetta");
+
+    @BeforeAll
+    static void beforeAll() {
+    }
+
+    @Order(100)
+    @Test
+    void allVehiclesWithoutAuthentication() {
+
+        Response response = given().get("/api");
+
+        //assertThat(response.statusCode()).isEqualTo(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
+
+        // 401 ... unauthorized
+        assertThat(response.statusCode()).isEqualTo(401);
+
+    }
+
+    @Order(200)
+    @Test
+    void allVehiclesWithAuthentication() {
+
+        // arrange
+
+        // act
+        Response response = given()
+                .auth().basic("hansi", "passme")
+                .get("/api");
+
+        // assert
+        //assertThat(response.statusCode()).isEqualTo(javax.ws.rs.core.Response.Status.UNAUTHORIZED.getStatusCode());
+        // 401 ... unauthorized
+        assertThat(response.statusCode()).isEqualTo(200);
+
+        String body = response.body().asPrettyString();
+        System.out.println(body);
+        JsonPath jsonPathEvaluator = response.jsonPath();
+        List<VehicleDto> vehicles = jsonPathEvaluator.getList("", VehicleDto.class);
+        assertThat(vehicles.size()).isEqualTo(3);
+        assertThat(vehicles).contains(horch,bmw,tucker);
+    }
+
+}
+----
+
+
+//include::keycloak-angular.adoc[]
+//<<keycloak-angular.adoc#, open doc>>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////
+
+
+== Authorization with Policies
+
+see also https://quarkus.io/guides/security-keycloak-authorization[Quarkus - Using OpenID Connect and Keycloak to Centralize Authorizations]
+
+== Create your Quarkus Project
+
+----
+mvn io.quarkus:quarkus-maven-plugin:1.5.0.Final:create \
+  -DprojectGroupId=at.htl \
+  -DprojectArtifactId=quarkus-openid-connect \
+  -Dextensions="oidc, resteasy-jsonb"
+----
+
+== Add the Endpoint (Resource)
+
+.UserResource.java
+[source,java]
+----
+include::{sourcedir-code}/UserResource.java[]
+----
+
+== Application configuration
+
+.application.properties
+[source,properties,options="nowrap"]
+----
+include::{sourcedir-code}/../../../resources/application.properties[]
+----
+
+== Make the Initial Commit
+
+[source,shell]
+----
+cd openid-connect-policies
+
+git init
+git add .
+git commit -m "inital commit"
+git remote add origin https://github.com/<your github-account>/openid-connect-policies.git
+git push -u origin master
+
+idea .
+----
+
+== Add a extension
+
+[source,shell]
+----
+./mvnw quarkus:add-extension -Dextensions="keycloak-authorization"
+----
+
+== Start Keycloak
+
+[source,shell]
+----
+docker run --name keycloak -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -e DB_VENDOR=h2 -p 8180:8080 jboss/keycloak
+----
+
+Open in Browser:
+http://localhost:8180
+
+== Configure Keycloak
+
+-> Administration Console
+
+* Add realm
+** Name: quarkus
+** kbd:[Create]
+* Clients
+** kbd:[Create]
+*** ClientID: my-backend-service
+*** Client Protocol: openid-connect
+*** Click kbd:[Save]
+* Users
+** kbd:[Add user]
+*** Details
+**** Username: admin
+**** Email Verified: ON
+**** kbd:[Save]
+*** Credentials
+**** Password: passme
+**** Password Confirmation: passme
+**** Temporary: OFF
+**** kbd:[Set Password]
+**** Are you sure you want to set a password for the user?: kbd:[Set password]
+
+Now make a User "user" like "admin".
+
+* Clients -> my-backend-service
+** Settings
+*** Access Type: confidential
+*** Service Accounts Enabled: ON
+*** Authorization Enabled: OFF
+*** Valid Redirect URIs: http://localhost:8080/
+*** kbd:[Save]
+** Credentials
+*** Copy Secret into clipboard
+*** Paste the secret in application.properties in the line "quarkus.oidc.credentials.secret"
+
+== Access Keycloak
+
+Now we will access Keycloak for the first time and retrieve the access token.
+
+. Create a folder called `http-request` in the project root.
+. Create a file called `requests.http` (the http-ending is important)
+. Open the file `requests.http` and click on `Add Environmental File` -> Option `Regular`
+
+Now a file called `http-client.env.json` was created:
+
+We define some variables:
+
+.http-client.env.json
+----
+{
+  "dev": {
+    "keycloak-host": "http://localhost:8180",
+    "quarkus-host": "http://localhost:8080",
+    "username": "my-backend-service",
+    "password": "97fdb5b3-6fff-4090-966a-0f1c7355d0ba" // <.>
+  }
+}
+----
+
+<.> use your secret
+
+.requests.http
+----
+POST {{keycloak-host}}/auth/realms/quarkus/protocol/openid-connect/token
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/x-www-form-urlencoded
+
+username=user&password=passme&grant_type=password
+----
+
+The output shows status code 201 and the access token.
+
+== Configure Resources
+
+* Clients -> my-backend-service
+** Authorization
+*** Resources
+**** Actions - Delete the Default Resource -> Confirm the deletion
+**** kbd:[Create]
+**** Add Resource
+***** Name: Users resource
+***** Display name: Users resource
+***** URI: /api/users/*
+***** kbd:[Save]
+**** kbd:[Create]
+**** Add Resource
+***** Name: Admin resource
+***** Display name: Admin resource
+***** URI: /api/admin/*
+***** kbd:[Save]
+
+image:clients-authorization-resources.png[]
+
+* Roles
+** kbd:[Add Role]
+*** Role Name: user
+*** kbd:[Save]
+** kbd:[Add Role]
+*** Role Name: admin
+*** kbd:[Save]
+
+* Users
+** kbd:[View all users]
+** Click on ID of user 'user'
+*** Role Mappings
+**** add Role 'user' to Assigned Roles
+** Click on ID of user 'admin'
+*** Role Mappings
+**** add Roles 'user' and `admin` to Assigned Roles
+
+* Clients -> my-backend-service
+** Authorization
+*** Policies
+**** Create Policy ... -> Role
+***** Name: Users policy
+***** Description: Ability to use users resources
+***** Realm Roles: user
+***** kbd:[Save]
+**** Create Policy ... -> Role
+***** Name: Admin policy
+***** Description: Ability to use admins resources
+***** Realm Roles: admin
+***** kbd:[Save]
+
+*** Permissions
+**** Default Permission -> kbd:[Delete] -> Confirm Deletion
+**** Create Permission... -> Resource-Based
+***** Name: Users permission
+***** Resources: Users resource
+***** Apply Policy: Users policy
+***** kbd:[Save]
+**** Create Permission... -> Resource-Based
+***** Name: Admins permission
+***** Resources: Admins resource
+***** Apply Policy: Admins policy
+***** kbd:[Save]
+
+image:clients-authorization-permissions.png[]
+
+== Test the Access to the Resources
+
+=== Resource admin is unauthorized (w/o any authorization)
+
+.Request with variable
+----
+GET {{quarkus-host}}/api/admin
+----
+
+.Request + Response
+----
+GET http://localhost:8080/api/admin
+
+HTTP/1.1 401 Unauthorized
+content-length: 0
+
+<Response body is empty>
+
+Response code: 401 (Unauthorized); Time: 644ms; Content length: 0 bytes
+----
+
+=== Resource users is unauthorized (w/o any authorization)
+
+.Request with variable
+----
+GET {{quarkus-host}}/api/users
+----
+
+.Request + Response
+----
+GET http://localhost:8080/api/users
+
+HTTP/1.1 401 Unauthorized
+content-length: 0
+
+<Response body is empty>
+
+Response code: 401 (Unauthorized); Time: 54ms; Content length: 0 bytes
+----
+
+
+
+
+
+=== User 'user' access Resource 'users'
+
+==== Retrieves access token
+
+----
+POST {{keycloak-host}}/auth/realms/quarkus/protocol/openid-connect/token
+Authorization: Basic {{username}} {{password}}   # <.>
+Content-Type: application/x-www-form-urlencoded
+
+username=user&password=passme&grant_type=password
+
+> {% client.global.set("auth_token", response.body.access_token); %}  # <.>
+----
+
+<.> you have to provide: `Authorization: Basic {client-id} {secret}`
+<.> the access-token is saved in a variable `auth_token`, so the next request can use it
+
+==== Accesses the users-Resource - 200
+
+----
+GET {{quarkus-host}}/api/users
+Authorization: Bearer {{auth_token}}
+----
+
+==== Accesses the admin-Resource - 403
+
+.Request with variable
+----
+GET {{quarkus-host}}/api/admin
+Authorization: Bearer {{auth_token}}
+----
+
+.Request + Response
+----
+GET http://localhost:8080/api/admin
+
+HTTP/1.1 403 Forbidden
+content-length: 0
+
+<Response body is empty>
+----
+
+
+
+
+
+
+=== User 'admin' access Resource 'users'
+
+==== Retrieves access token
+
+----
+POST {{keycloak-host}}/auth/realms/quarkus/protocol/openid-connect/token
+Authorization: Basic {{username}} {{password}}  # <.>
+Content-Type: application/x-www-form-urlencoded
+
+username=admin&password=passme&grant_type=password  # <.>
+
+> {% client.global.set("auth_token", response.body.access_token); %}
+----
+
+<.> you have to provide: `Authorization: Basic {client-id} {secret}`
+<.> the access-token is saved in a variable `auth_token`, so the next request can use it
+
+==== Accesses the users-Resource - 200
+
+----
+GET {{quarkus-host}}/api/users
+Authorization: Bearer {{auth_token}}
+----
+
+==== Accesses the admin-Resource - 200
+
+.Request with variable
+----
+GET {{quarkus-host}}/api/admin
+Authorization: Bearer {{auth_token}}
+----
+
+.Request + Response
+----
+GET http://localhost:8080/api/admin
+
+HTTP/1.1 200 OK
+Cache-Control: no-cache
+Content-Length: 10
+Content-Type: application/json
+
+I am admin
+----
+
+
+////
+

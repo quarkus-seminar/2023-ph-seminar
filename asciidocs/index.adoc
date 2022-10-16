@@ -5,6 +5,8 @@
 
 * grober Überblick Ökosystem (1h)
 ** https://pypl.github.io/PYPL.html
+** https://insights.stackoverflow.com/survey/2021#overview (im Vergleich zu 2020 fällt c# zurück) bzw. https://insights.stackoverflow.com/survey/2021#section-most-popular-technologies-programming-scripting-and-markup-languages[Programming, scripting, and markup languages^]
+
 
 ** Cloud Computing / Serverless als (kommendes) Paradigma
 *** Abgrenzung zu Google Drive, OneDrive usw
