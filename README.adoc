@@ -1,0 +1,3 @@
+= 2023-ph-seminar
+
+* https://quarkus-seminar.github.io/2023-ph-seminar/leo-todo.html
