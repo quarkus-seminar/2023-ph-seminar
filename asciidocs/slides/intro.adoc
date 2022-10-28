@@ -1,0 +1,132 @@
+= Quarkus: supersonic, subatomic, Java
+:author: C. Aberger, T. Stütz
+:email: t.stuetz@htl-leonding.ac.at
+:revnumber: 1.0
+:revdate: {docdate}
+:revremark: SCHILF @ HTL Leonding
+:encoding: utf-8
+:lang: de
+:imgesdir: images
+:doctype: article
+:icons: font
+:customcss: css/presentation.css
+//:revealjs_customtheme: css/sky.css
+:revealjs_customtheme: css/black.css
+:revealjs_width: 1408
+:revealjs_height: 792
+:source-highlighter: highlightjs
+//:revealjs_parallaxBackgroundImage: images/background-landscape-light-orange.jpg
+//:revealjs_parallaxBackgroundSize: 4936px 2092px
+:highlightjs-theme: css/atom-one-light.css
+// we want local served font-awesome fonts
+:iconfont-remote!:
+:iconfont-name: fonts/fontawesome/css/all
+//:revealjs_parallaxBackgroundImage: background-landscape-light-orange.jpg
+//:revealjs_parallaxBackgroundSize: 4936px 2092px
+
+//:numbered:
+
+// Kürzen des Videos
+// ffmpeg -ss 00:00:00 -i orchestra.mp4 -to 00:00:05 -c copy orchestra-short.mp4
+
+
+
+
+
+
+////
+image::quarkusio-get-started.png[]
+
+Testing filter by changing documentation file
+////
+
+[%notitle]
+== Title translatet
+
+image::intro/01-title-translated.001.png[]
+
+////
+[.lightbg,background-image="intro/competition-computer-computing-perspective-sky.jpg",background-size="cover",background-opacity="0.7"]
+== Cloud Computing
+
+* aktuell
+* time-to-market
+* keine Server-Administration
+* Schlagwort "Serverless"
+////
+
+[.lightbg,background-video="videos/clouds-pexels-videos-3723.mp4",background-video-loop="true",background-opacity="0.7"]
+== Cloud Computing
+
+* aktuelles Technologie-Konzept
+* kurze time-to-market -> Startups
+* keine Server-Administration notwendig
+* Schlagwort "Serverless"
+
+
+
+
+
+[%notitle]
+== Serverless
+
+image::intro/01.webp[]
+
+
+[%notitle]
+== Serverless
+
+image::intro/02-serverless.png[background, size="contain"]
+
+
+[%notitle]
+== Serverless
+
+image::intro/03.png[background, size="contain"]
+
+
+[%notitle]
+== Serverless
+
+image::intro/04.png[background, size="contain"]
+
+
+[%notitle]
+== Serverless
+
+image::intro/05.png[background, size="contain"]
+
+
+[%notitle]
+== Serverless
+
+image::intro/06.png[background, size="contain"]
+
+
+[%notitle]
+== Serverless
+
+image::intro/07.png[background, size="contain"]
+
+
+[%notitle]
+== Serverless
+
+image::intro/08.png[background, size="contain"]
+
+[%notitle]
+== Serverless
+
+image::intro/artikel-java.png[background, size="contain"]
+
+
+
+
+
+
+== Contributions
+
+* <a href="https://www.freepik.com/free-photo/competition-computer-computing-perspective-sky_1046096.htm#query=cloud%20computing&position=3&from_view=search&track=sph">Image by evening_tao</a> on Freepik
+
+* Video by Pixabay: https://www.pexels.com/video/time-lapse-of-cumulus-clouds-856171/
+
