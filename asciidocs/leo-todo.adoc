@@ -574,7 +574,7 @@ Because so it is possible to catch exceptions when writing to the database when 
 
 ////
 .database content
-image::tdd-db-content-03.png[]
+image::tdd-db-content-03-pay-per-use-modell.png[]
 ////
 
 

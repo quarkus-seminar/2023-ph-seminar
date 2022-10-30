@@ -1,0 +1,201 @@
+= Quarkus: supersonic, subatomic, Java
+//:author: C. Aberger, T. Stütz
+:email: t.stuetz@htl-leonding.ac.at
+:revnumber: 1.0
+:revdate: {docdate}
+:revremark: SCHILF @ HTL Leonding
+:encoding: utf-8
+:lang: de
+:imgesdir: images
+:doctype: article
+:icons: font
+:customcss: css/presentation.css
+//:revealjs_customtheme: css/sky.css
+:revealjs_customtheme: css/black.css
+:revealjs_width: 1408
+:revealjs_height: 792
+:source-highlighter: highlightjs
+//:revealjs_parallaxBackgroundImage: images/background-landscape-light-orange.jpg
+//:revealjs_parallaxBackgroundSize: 4936px 2092px
+:highlightjs-theme: css/atom-one-light.css
+// we want local served font-awesome fonts
+:iconfont-remote!:
+:iconfont-name: fonts/fontawesome/css/all
+//:revealjs_parallaxBackgroundImage: background-landscape-light-orange.jpg
+//:revealjs_parallaxBackgroundSize: 4936px 2092px
+
+//:numbered:
+
+// Kürzen des Videos
+// ffmpeg -ss 00:00:00 -i orchestra.mp4 -to 00:00:05 -c copy orchestra-short.mp4
+
+
+
+
+
+
+////
+image::quarkusio-get-started.png[]
+
+Testing filter by changing documentation file
+////
+
+[%notitle]
+== Welcome
+
+image::intro/quarkus-animated-2.gif[background, size="cover"]
+
+////
+[%notitle]
+== Welcome
+
+image::intro/senkrechtstarter-quarkus-2.jpeg[background, size="contain"]
+////
+
+== Timeline
+
+image::intro/timeline.png[]
+
+
+== Cloud
+
+[.highlight-blue%step]
+* Vorteile
+[.highlight-blue%step]
+** Schnelle Provisionierung neuer Resourcen
+** bedarfsgerechte, automatische Skalierung von Services
+** Pay-per-Use-Modell
+
+* Anforderungen (Nachteile)
+[.highlight-blue%step]
+** Anwendungen sind keine Monolithen mehr, sondern Services
+[.highlight-blue%step]
+*** mit wenig Speicherbedarf
+*** kurzen Start- und Antwortzeiten
+*** flexibel, da modular aufgebaut
+
+
+[%notitle]
+== Pay-per-Use
+
+image::intro/03-pay-per-use-modell.png[background, size="contain"]
+
+
+
+
+[%notitle]
+=== Flaws of Traditional Java
+
+image::intro/04-traditional-java.png[background, size="contain"]
+
+
+
+=== Quarkus to the Rescue!
+
+image::intro/duke_superhero.png[width=700]
+
+
+=== Wenig Speicherbedarf
+
+* Build-time-optimization
+
+image::intro/build-time-optimizing.png[link=https://jax.de/blog/schneller-als-der-schall,width=800^]
+
+
+* Ahead-of-time Compilation mit GraalVM
+
+image:intro/create-native-image.png[width=800]
+
+[.notes]
+--
+* Optimierung
+** etliche dynamische Konstrukte aufgelöst und durch statische Pendants ersetzt werden
+** Größe der Anwendung – je nach verwendeten Libraries – etwa um die Hälfte zu minimieren
+** Fast-Jar Classloader
+*** persistiert zur Build-Zeit die Lokationen aller Klassen und Ressourcen, sodass sie zum Start-up nur noch eingelesen werden müssen
+
+* Ahead-of-time Compilation
+** Die Größe der Anwendung verringert sich, je nach Anwendung, um einen Faktor bis zu zehn gegenüber der ursprünglichen Variante.
+** Die Start-up-Zeit sinkt in den Bereich von Millisekunden.
+--
+
+
+=== Kurze Startzeiten
+
+image::intro/startup-phases.png[]
+
+* https://www.infoq.com/articles/native-java-quarkus/[Kubernetes Native Java with Quarkus, 2022^]
+
+[.notes]
+--
+* Load and parse configuration
+* Analyze dependencies
+* Build dependency tree
+* Package application
+--
+
+////
+[.refs]
+--
+Reactive Systems in Java, o’Reilly S.44
+--
+////
+
+
+=== Modular aufgebaut
+
+image::intro/monolith-vs-docker-service.png[width=1200]
+
+
+[%notitle]
+== Small Footprint
+
+image::intro/06-quarkus-footprint.png[background, size="contain"]
+
+
+
+== Quarkus
+
+* kein Technologiebruch
+** APIs von Java EE/Jakarta EE werden verwendet
+** Konzentration auf Applikationscode möglich
+
+[%notitle]
+== Quarkus Features
+
+image::intro/07-features.png[background, size="contain"]
+
+
+[%notitle]
+== Quarkus Tools
+
+image::intro/08-tools.png[background, size="contain"]
+
+
+
+[.lightbg,background-image="intro/edvsaal-sigmund-rWE7bTqgMJE-unsplash.jpg",background-size="cover",background-opacity="0.7"]
+== It's Demo Time
+
+
+
+
+
+== Kubernetes Cluster
+
+image::intro/kubernetes-cluster.png[]
+
+[.refs]
+--
+* aus javamagazin 6/22 S.11
+--
+
+
+
+
+=== CI/CD-Pipeline
+
+image::intro/ci-cd-pipeline.png[]
+
+
+
+
