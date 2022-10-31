@@ -1,3 +1,31 @@
 = 2023-ph-seminar
+:icons: font
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+endif::[]
+
+.run local
+[source,shell]
+----
+rm -rf ./dist && ./convert.sh
+----
 
 * https://quarkus-seminar.github.io/2023-ph-seminar/leo-todo.html
+
+* https://quarkus-seminar.github.io/2023-ph-seminar/slides/intro.html
+
+* https://quarkus-seminar.github.io/2023-ph-seminar/slides/intro2.html
+
+TIP: Das ist ein Test
+
+
+== Resources
+
+* https://www.slideshare.net/GiuseppeBonocore/quarkuscode-garden
+
+* https://www.infoq.com/articles/native-java-quarkus/[2022 - Kubernetes Native Java with Quarkus]
+
+* https://quarkus.io/blog/quarkus-superheroes-to-the-rescue/[2022 - Quarkus Superheroes to the Rescue!]
+
+* https://jax.de/blog/schneller-als-der-schall/[2022 - Schneller als der Schall: Ist Quarkus die Zukunft von Enterprise Java für die Cloud?]
