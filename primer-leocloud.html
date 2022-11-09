@@ -666,11 +666,21 @@ pre.rouge {
 <li><a href="#_login_into_registry">2.2. Login into Registry</a></li>
 </ul>
 </li>
-<li><a href="#_create_and_push_the_container_image_using_jib">3. Create and Push the Container Image using Jib</a></li>
-<li><a href="#_deploy_your_application_to_your_kubernetes_cluster">4. Deploy your application to your Kubernetes cluster</a></li>
-<li><a href="#_zugriff_auf_die_app">5. Zugriff auf die App</a></li>
-<li><a href="#_neu_kompilieren_bauen_und_deployen">6. Neu kompilieren, bauen und deployen</a></li>
-<li><a href="#_sources">7. Sources</a></li>
+<li><a href="#_config_quarkus_app">3. Config Quarkus App</a></li>
+<li><a href="#_create_and_push_the_container_image_using_jib">4. Create and Push the Container Image using Jib</a>
+<ul class="sectlevel2">
+<li><a href="#_push_docker_image_into_docker_registry_jar">4.1. Push Docker Image into Docker Registry (jar)</a></li>
+<li><a href="#_make_docker_image_in_package_public">4.2. Make Docker Image in Package public</a></li>
+</ul>
+</li>
+<li><a href="#_deploy_your_application_to_your_kubernetes_cluster">5. Deploy your application to your Kubernetes cluster</a>
+<ul class="sectlevel2">
+<li><a href="#_delete_your_cluster">5.1. Delete your Cluster</a></li>
+</ul>
+</li>
+<li><a href="#_zugriff_auf_die_app">6. Zugriff auf die App</a></li>
+<li><a href="#_neu_kompilieren_bauen_und_deployen">7. Neu kompilieren, bauen und deployen</a></li>
+<li><a href="#_sources">8. Sources</a></li>
 </ul>
 </div>
 </div>
@@ -678,9 +688,9 @@ pre.rouge {
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p><span class="icon"><a class="image" href="https://raw.githubusercontent.com/htl-leonding-college/asciidoctor-docker-template/master/asciidocs/primer-leocloud.adoc"><i class="fa fa-file-text-o"></i></a></span> ‏ ‏ ‎
+<p><span class="icon"><a class="image" href="https://raw.githubusercontent.com/quarkus-seminar/2023-ph-seminar/main/asciidocs/primer-leocloud.adoc"><i class="fa fa-file-text-o"></i></a></span> ‏ ‏ ‎
 <span class="icon"><a class="image" href="https://github.com/quarkus-seminar/"><i class="fa fa-github-square"></i></a></span> ‏ ‏ ‎
-<span class="icon"><a class="image" href="https://bit.ly/htlleonding"><i class="fa fa-home"></i></a></span></p>
+<span class="icon"><a class="image" href="http://edufs.edu.htl-leonding.ac.at/~t.stuetz/hugo/2021/01/technology-notes/"><i class="fa fa-home"></i></a></span></p>
 </div>
 </div>
 </div>
@@ -785,8 +795,48 @@ Login Succeeded</pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_create_and_push_the_container_image_using_jib"><a class="anchor" href="#_create_and_push_the_container_image_using_jib"></a>3. Create and Push the Container Image using Jib</h2>
+<h2 id="_config_quarkus_app"><a class="anchor" href="#_config_quarkus_app"></a>3. Config Quarkus App</h2>
 <div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">quarkus.container-image.group</span><span class="p">=</span><span class="s">htl-leonding</span>
+<span class="py">quarkus.container-image.name</span><span class="p">=</span><span class="s">primer-leocloud</span>
+<span class="py">quarkus.container-image.tag</span><span class="p">=</span><span class="s">1.0.0</span>
+
+<span class="c"># LeoCloud namespace
+</span><span class="py">quarkus.kubernetes.namespace</span><span class="p">=</span><span class="s">student-t-stuetz</span>
+
+<span class="c"># docker registry
+</span><span class="py">quarkus.container-image.registry</span><span class="p">=</span><span class="s">ghcr.io</span>
+
+<span class="c"># service
+# quarkus.kubernetes.service-type=
+</span>
+<span class="c"># ingress
+</span><span class="py">quarkus.kubernetes.ingress.expose</span><span class="p">=</span><span class="s">true</span>
+<span class="py">quarkus.kubernetes.ingress.host</span><span class="p">=</span><span class="s">student.cloud.htl-leonding.ac.at</span>
+<span class="py">quarkus.kubernetes.ports.http.path</span><span class="p">=</span><span class="s">/my-first-app(/|$)(.*)$</span>
+
+<span class="c"># für debuggen
+</span><span class="py">quarkus.http.access-log.enabled</span><span class="p">=</span><span class="s">true</span>
+
+<span class="py">quarkus.http.root-path</span><span class="p">=</span><span class="s">my-first-app</span></code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://dev.to/pavanbelagatti/kubernetes-service-types-explained-207g" target="_blank" rel="noopener">Kubernetes Service Types Explained</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_create_and_push_the_container_image_using_jib"><a class="anchor" href="#_create_and_push_the_container_image_using_jib"></a>4. Create and Push the Container Image using Jib</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_push_docker_image_into_docker_registry_jar"><a class="anchor" href="#_push_docker_image_into_docker_registry_jar"></a>4.1. Push Docker Image into Docker Registry (jar)</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash">./mvnw clean package <span class="nt">-DskipTests</span> <span class="nt">-Dquarkus</span>.container-image.push<span class="o">=</span><span class="nb">true</span></code></pre>
@@ -854,9 +904,67 @@ Login Succeeded</pre>
 </div>
 </details>
 </div>
+<div class="sect2">
+<h3 id="_make_docker_image_in_package_public"><a class="anchor" href="#_make_docker_image_in_package_public"></a>4.2. Make Docker Image in Package public</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com" class="bare">https://github.com</a></p>
+</li>
+<li>
+<p>go to the repositories tab</p>
+</li>
+<li>
+<p>click the <code>Packages</code>-tab</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/packages-in-github.png" alt="packages in github">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>click your package</p>
+</li>
+<li>
+<p>click <code>Package settings</code></p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/packages-in-github-2.png" alt="packages in github 2">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Click <kbd>Change visibility</kbd> in "Danger Zone"</p>
+</li>
+<li>
+<p>Check <code>Public</code></p>
+</li>
+<li>
+<p>Confirm package name</p>
+</li>
+<li>
+<p>Click <kbd>I understand the consequences; change package visibility</kbd></p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/packages-in-github-3.png" alt="packages in github 3">
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="sect1">
-<h2 id="_deploy_your_application_to_your_kubernetes_cluster"><a class="anchor" href="#_deploy_your_application_to_your_kubernetes_cluster"></a>4. Deploy your application to your Kubernetes cluster</h2>
+<h2 id="_deploy_your_application_to_your_kubernetes_cluster"><a class="anchor" href="#_deploy_your_application_to_your_kubernetes_cluster"></a>5. Deploy your application to your Kubernetes cluster</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
@@ -870,10 +978,18 @@ Login Succeeded</pre>
 deployment.apps/primer-leocloud created</pre>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_delete_your_cluster"><a class="anchor" href="#_delete_your_cluster"></a>5.1. Delete your Cluster</h3>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl delete -f target/kubernetes/kubernetes.yml</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_zugriff_auf_die_app"><a class="anchor" href="#_zugriff_auf_die_app"></a>5. Zugriff auf die App</h2>
+<h2 id="_zugriff_auf_die_app"><a class="anchor" href="#_zugriff_auf_die_app"></a>6. Zugriff auf die App</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
@@ -890,7 +1006,7 @@ primer-leocloud-86dd7864f4-7xllm        1/1     Running   0          16m   10.24
 </div>
 </div>
 <div class="sect1">
-<h2 id="_neu_kompilieren_bauen_und_deployen"><a class="anchor" href="#_neu_kompilieren_bauen_und_deployen"></a>6. Neu kompilieren, bauen und deployen</h2>
+<h2 id="_neu_kompilieren_bauen_und_deployen"><a class="anchor" href="#_neu_kompilieren_bauen_und_deployen"></a>7. Neu kompilieren, bauen und deployen</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
@@ -900,7 +1016,7 @@ primer-leocloud-86dd7864f4-7xllm        1/1     Running   0          16m   10.24
 </div>
 </div>
 <div class="sect1">
-<h2 id="_sources"><a class="anchor" href="#_sources"></a>7. Sources</h2>
+<h2 id="_sources"><a class="anchor" href="#_sources"></a>8. Sources</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -917,7 +1033,7 @@ primer-leocloud-86dd7864f4-7xllm        1/1     Running   0          16m   10.24
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-11-09 15:32:41 UTC
+Last updated 2022-11-09 22:28:35 UTC
 </div>
 </div>
 </body>
