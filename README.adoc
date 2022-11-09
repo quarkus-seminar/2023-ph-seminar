@@ -17,6 +17,8 @@ rm -rf ./dist && ./convert.sh
 
 * https://quarkus-seminar.github.io/2023-ph-seminar/slides/intro2.html
 
+* https://quarkus-seminar.github.io/2023-ph-seminar/primer-leocloud.html
+
 TIP: Das ist ein Test
 
 

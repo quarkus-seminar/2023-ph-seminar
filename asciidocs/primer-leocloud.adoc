@@ -169,6 +169,8 @@ quarkus.http.root-path=my-first-app
 
 === Push Docker Image into Docker Registry (native)
 
+* Könnte sein, dass das nur funktioniert, wenn Architektur von Entwicklermaschine und k8s ident ist (amd64 oder arm64)
+
 * Zuerst muss man sich das korrekte Image zur jeweiligen Rechnerarchitekur heraussuchen -> https://quay.io/repository/quarkus/ubi-quarkus-mandrel-builder-image?tab=tags[quay.io^]
 
 [source,bash]
