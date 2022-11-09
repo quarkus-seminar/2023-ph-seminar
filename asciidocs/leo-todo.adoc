@@ -37,7 +37,7 @@ IMPORTANT: https://code.quarkus.io/?g=at.htl&a=leo-todo&e=resteasy-reactive-jack
 
 ** kbd:[Generate your application]
 
-** kbd[DOWNLOAD THE ZIP]
+** kbd:[DOWNLOAD THE ZIP]
 
 ** Extract the zip
 

@@ -252,5 +252,8 @@ primer-leocloud-86dd7864f4-7xllm        1/1     Running   0          16m   10.24
 
 == Sources
 
-* https://redhat-developer-demos.github.io/quarkus-tutorial/quarkus-tutorial/kubernetes.html
-* https://cloud.htl-leonding.ac.at
+* https://caberger.github.io/leocloud/[LeoCloud^]
+* https://redhat-developer-demos.github.io/quarkus-tutorial/quarkus-tutorial/kubernetes.html[^]
+* https://cloud.htl-leonding.ac.at[^]
+* https://dev.to/pavanbelagatti/kubernetes-service-types-explained-207g[Kubernetes Service Types Explained ^]
+* https://medium.com/avmconsulting-blog/service-types-in-kubernetes-24a1587677d6[Service Types in Kubernetes?^]
