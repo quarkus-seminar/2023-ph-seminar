@@ -616,7 +616,7 @@ public void delete(@PathParam("id") long id) {
 
 image::tdd-tests-fail-05.png[]
 
-link::website.zip[]
+
 
 
 == Website

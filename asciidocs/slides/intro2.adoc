@@ -197,5 +197,7 @@ image::intro/kubernetes-cluster.png[]
 image::intro/ci-cd-pipeline.png[]
 
 
+== Simple Deployment to k8s
 
+image::intro/simple-deployment-to-k8s.png[]
 
