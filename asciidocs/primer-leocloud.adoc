@@ -7,9 +7,68 @@ ifdef::backend-html5[]
 
 // https://fontawesome.com/v4.7.0/icons/
 icon:file-text-o[link=https://raw.githubusercontent.com/quarkus-seminar/2023-ph-seminar/main/asciidocs/{docname}.adoc] ‏ ‏ ‎
-icon:github-square[link=https://github.com/quarkus-seminar/] ‏ ‏ ‎
+icon:github-square[link=https://github.com/quarkus-seminar/2023-ph-seminar] ‏ ‏ ‎
 icon:home[link=http://edufs.edu.htl-leonding.ac.at/~t.stuetz/hugo/2021/01/technology-notes/]
 endif::backend-html5[]
+
+
+== Precondition
+
+* Docker should be installed.
+
+
+== Create the Project
+
+.quarkus.io -> START CODING
+image::quarkusio-get-started.png[]
+
+* Folgende Libraries werden ausgewählt:
+** RESTEasy Reactive Jackson
+
+
+IMPORTANT: https://code.quarkus.io/?g=at.htl&a=primer-leocloud&e=resteasy-reactive-jackson[Quick Link for Project Generation^]
+
+=== Variante 1 - download the zip
+
+** kbd:[Generate your application]
+
+** kbd:[DOWNLOAD THE ZIP]
+
+** Extract the zip
+
+** cd primer-leocloud
+
+** open project in IDE
+
+=== Variante 2 - use a git repo
+
+==== Push to git-repo
+
+image::quarkusio-push-to-github.png[]
+
+image::quarkusio-github-info.png[]
+
+==== Clone git-repo
+
+image::intellij-community-startscreen.png[]
+
+.copy the url into the clipboard
+image::github-repo-todo.png[]
+
+.paste url in intellij-form
+image::intellij-get-from-vcs.png[]
+
+image::intellij-trust-project.png[]
+
+== Demo-Code and http-requests
+
+image::primer-leocloud-democode.png[]
+
+* run it with `./mvnw clean quarkus:dev`
+
+* use requests.http
+** `GET http://localhost:8080`
+** `GET http://localhost:8080/hello`
 
 == Install kubernetes extension
 
@@ -34,7 +93,7 @@ endif::backend-html5[]
 
 . Give a expiration date i.e. `90 days`
 
-. Check `write:packages`
+. Check `write:packages` and `workflow`
 +
 image::token-ghcr.png[]
 
@@ -71,7 +130,9 @@ Login Succeeded
 
 [source,properties]
 ----
+# github-account-name
 quarkus.container-image.group=htl-leonding
+
 quarkus.container-image.name=primer-leocloud
 quarkus.container-image.tag=1.0.0
 
@@ -81,18 +142,18 @@ quarkus.kubernetes.namespace=student-t-stuetz
 # docker registry
 quarkus.container-image.registry=ghcr.io
 
-# service
-# quarkus.kubernetes.service-type=
 
 # ingress
 quarkus.kubernetes.ingress.expose=true
 quarkus.kubernetes.ingress.host=student.cloud.htl-leonding.ac.at
-quarkus.kubernetes.ports.http.path=/my-first-app(/|$)(.*)$
+# leocloud-prefix
+quarkus.kubernetes.ports.http.path=/t.stuetz(/|$)(.*)$
 
-# für debuggen
+# leocloud-prefix
+quarkus.http.root-path=t.stuetz
+
+# für debuggen (requests werden in quarkus log angezeigt)
 quarkus.http.access-log.enabled=true
-
-quarkus.http.root-path=my-first-app
 ----
 
 * https://dev.to/pavanbelagatti/kubernetes-service-types-explained-207g[Kubernetes Service Types Explained^]

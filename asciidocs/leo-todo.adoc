@@ -16,7 +16,6 @@ ifndef::imagesdir[:imagesdir: images]
 
 * Docker should be installed.
 
-<<<
 
 == Create the Project
 
@@ -459,7 +458,7 @@ image::cont-testing-02-second-testcontainer.png[width=400]
 
 
 .we are using test-driven-development
-image::test-driven-development.png[]
+image::test-driven-development.png[width=400]
 
 === Write all tests
 
