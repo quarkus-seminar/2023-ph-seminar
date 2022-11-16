@@ -659,28 +659,36 @@ pre.rouge {
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_install_kubernetes_extension">1. Install kubernetes extension</a></li>
-<li><a href="#_docker_image_registry">2. Docker-Image-Registry</a>
+<li><a href="#_precondition">1. Precondition</a></li>
+<li><a href="#_create_the_project">2. Create the Project</a>
 <ul class="sectlevel2">
-<li><a href="#_erstellen_eines_zugriffstokens">2.1. Erstellen eines Zugriffstokens</a></li>
-<li><a href="#_login_into_registry">2.2. Login into Registry</a></li>
+<li><a href="#_variante_1_download_the_zip">2.1. Variante 1 - download the zip</a></li>
+<li><a href="#_variante_2_use_a_git_repo">2.2. Variante 2 - use a git repo</a></li>
 </ul>
 </li>
-<li><a href="#_config_quarkus_app">3. Config Quarkus App</a></li>
-<li><a href="#_create_and_push_the_container_image_using_jib">4. Create and Push the Container Image using Jib</a>
+<li><a href="#_demo_code_and_http_requests">3. Demo-Code and http-requests</a></li>
+<li><a href="#_install_kubernetes_extension">4. Install kubernetes extension</a></li>
+<li><a href="#_docker_image_registry">5. Docker-Image-Registry</a>
 <ul class="sectlevel2">
-<li><a href="#_push_docker_image_into_docker_registry_jar">4.1. Push Docker Image into Docker Registry (jar)</a></li>
-<li><a href="#_make_docker_image_in_package_public">4.2. Make Docker Image in Package public</a></li>
+<li><a href="#_erstellen_eines_zugriffstokens">5.1. Erstellen eines Zugriffstokens</a></li>
+<li><a href="#_login_into_registry">5.2. Login into Registry</a></li>
 </ul>
 </li>
-<li><a href="#_deploy_your_application_to_your_kubernetes_cluster">5. Deploy your application to your Kubernetes cluster</a>
+<li><a href="#_config_quarkus_app">6. Config Quarkus App</a></li>
+<li><a href="#_create_and_push_the_container_image_using_jib">7. Create and Push the Container Image using Jib</a>
 <ul class="sectlevel2">
-<li><a href="#_delete_your_cluster">5.1. Delete your Cluster</a></li>
+<li><a href="#_push_docker_image_into_docker_registry_jar">7.1. Push Docker Image into Docker Registry (jar)</a></li>
+<li><a href="#_make_docker_image_in_package_public">7.2. Make Docker Image in Package public</a></li>
 </ul>
 </li>
-<li><a href="#_zugriff_auf_die_app">6. Zugriff auf die App</a></li>
-<li><a href="#_neu_kompilieren_bauen_und_deployen">7. Neu kompilieren, bauen und deployen</a></li>
-<li><a href="#_sources">8. Sources</a></li>
+<li><a href="#_deploy_your_application_to_your_kubernetes_cluster">8. Deploy your application to your Kubernetes cluster</a>
+<ul class="sectlevel2">
+<li><a href="#_delete_your_cluster">8.1. Delete your Cluster</a></li>
+</ul>
+</li>
+<li><a href="#_zugriff_auf_die_app">9. Zugriff auf die App</a></li>
+<li><a href="#_neu_kompilieren_bauen_und_deployen">10. Neu kompilieren, bauen und deployen</a></li>
+<li><a href="#_sources">11. Sources</a></li>
 </ul>
 </div>
 </div>
@@ -689,13 +697,155 @@ pre.rouge {
 <div class="sectionbody">
 <div class="paragraph">
 <p><span class="icon"><a class="image" href="https://raw.githubusercontent.com/quarkus-seminar/2023-ph-seminar/main/asciidocs/primer-leocloud.adoc"><i class="fa fa-file-text-o"></i></a></span> ‏ ‏ ‎
-<span class="icon"><a class="image" href="https://github.com/quarkus-seminar/"><i class="fa fa-github-square"></i></a></span> ‏ ‏ ‎
+<span class="icon"><a class="image" href="https://github.com/quarkus-seminar/2023-ph-seminar"><i class="fa fa-github-square"></i></a></span> ‏ ‏ ‎
 <span class="icon"><a class="image" href="http://edufs.edu.htl-leonding.ac.at/~t.stuetz/hugo/2021/01/technology-notes/"><i class="fa fa-home"></i></a></span></p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_install_kubernetes_extension"><a class="anchor" href="#_install_kubernetes_extension"></a>1. Install kubernetes extension</h2>
+<h2 id="_precondition"><a class="anchor" href="#_precondition"></a>1. Precondition</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Docker should be installed.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_create_the_project"><a class="anchor" href="#_create_the_project"></a>2. Create the Project</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="images/quarkusio-get-started.png" alt="quarkusio get started">
+</div>
+<div class="title">Figure 1. quarkus.io &#8594; START CODING</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Folgende Libraries werden ausgewählt:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>RESTEasy Reactive Jackson</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<a href="https://code.quarkus.io/?g=at.htl&amp;a=primer-leocloud&amp;e=resteasy-reactive-jackson" target="_blank" rel="noopener">Quick Link for Project Generation</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_variante_1_download_the_zip"><a class="anchor" href="#_variante_1_download_the_zip"></a>2.1. Variante 1 - download the zip</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><kbd>Generate your application</kbd></p>
+</li>
+<li>
+<p><kbd>DOWNLOAD THE ZIP</kbd></p>
+</li>
+<li>
+<p>Extract the zip</p>
+</li>
+<li>
+<p>cd primer-leocloud</p>
+</li>
+<li>
+<p>open project in IDE</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_variante_2_use_a_git_repo"><a class="anchor" href="#_variante_2_use_a_git_repo"></a>2.2. Variante 2 - use a git repo</h3>
+<div class="sect3">
+<h4 id="_push_to_git_repo"><a class="anchor" href="#_push_to_git_repo"></a>2.2.1. Push to git-repo</h4>
+<div class="imageblock">
+<div class="content">
+<img src="images/quarkusio-push-to-github.png" alt="quarkusio push to github">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/quarkusio-github-info.png" alt="quarkusio github info">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_clone_git_repo"><a class="anchor" href="#_clone_git_repo"></a>2.2.2. Clone git-repo</h4>
+<div class="imageblock">
+<div class="content">
+<img src="images/intellij-community-startscreen.png" alt="intellij community startscreen">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/github-repo-todo.png" alt="github repo todo">
+</div>
+<div class="title">Figure 2. copy the url into the clipboard</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/intellij-get-from-vcs.png" alt="intellij get from vcs">
+</div>
+<div class="title">Figure 3. paste url in intellij-form</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/intellij-trust-project.png" alt="intellij trust project">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_demo_code_and_http_requests"><a class="anchor" href="#_demo_code_and_http_requests"></a>3. Demo-Code and http-requests</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="images/primer-leocloud-democode.png" alt="primer leocloud democode">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>run it with <code>./mvnw clean quarkus:dev</code></p>
+</li>
+<li>
+<p>use requests.http</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>GET <a href="http://localhost:8080" class="bare">http://localhost:8080</a></code></p>
+</li>
+<li>
+<p><code>GET <a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a></code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_install_kubernetes_extension"><a class="anchor" href="#_install_kubernetes_extension"></a>4. Install kubernetes extension</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="title">Liste aller Extensions</div>
@@ -712,10 +862,10 @@ pre.rouge {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_docker_image_registry"><a class="anchor" href="#_docker_image_registry"></a>2. Docker-Image-Registry</h2>
+<h2 id="_docker_image_registry"><a class="anchor" href="#_docker_image_registry"></a>5. Docker-Image-Registry</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_erstellen_eines_zugriffstokens"><a class="anchor" href="#_erstellen_eines_zugriffstokens"></a>2.1. Erstellen eines Zugriffstokens</h3>
+<h3 id="_erstellen_eines_zugriffstokens"><a class="anchor" href="#_erstellen_eines_zugriffstokens"></a>5.1. Erstellen eines Zugriffstokens</h3>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -731,7 +881,7 @@ pre.rouge {
 <p>Give a expiration date i.e. <code>90 days</code></p>
 </li>
 <li>
-<p>Check <code>write:packages</code></p>
+<p>Check <code>write:packages</code> and <code>workflow</code></p>
 <div class="imageblock">
 <div class="content">
 <img src="images/token-ghcr.png" alt="token ghcr">
@@ -758,7 +908,7 @@ pre.rouge {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_login_into_registry"><a class="anchor" href="#_login_into_registry"></a>2.2. Login into Registry</h3>
+<h3 id="_login_into_registry"><a class="anchor" href="#_login_into_registry"></a>5.2. Login into Registry</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -795,11 +945,13 @@ Login Succeeded</pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_config_quarkus_app"><a class="anchor" href="#_config_quarkus_app"></a>3. Config Quarkus App</h2>
+<h2 id="_config_quarkus_app"><a class="anchor" href="#_config_quarkus_app"></a>6. Config Quarkus App</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="properties"><span class="py">quarkus.container-image.group</span><span class="p">=</span><span class="s">htl-leonding</span>
+<pre class="rouge highlight"><code data-lang="properties"><span class="c"># github-account-name
+</span><span class="py">quarkus.container-image.group</span><span class="p">=</span><span class="s">htl-leonding</span>
+
 <span class="py">quarkus.container-image.name</span><span class="p">=</span><span class="s">primer-leocloud</span>
 <span class="py">quarkus.container-image.tag</span><span class="p">=</span><span class="s">1.0.0</span>
 
@@ -809,18 +961,18 @@ Login Succeeded</pre>
 <span class="c"># docker registry
 </span><span class="py">quarkus.container-image.registry</span><span class="p">=</span><span class="s">ghcr.io</span>
 
-<span class="c"># service
-# quarkus.kubernetes.service-type=
-</span>
+
 <span class="c"># ingress
 </span><span class="py">quarkus.kubernetes.ingress.expose</span><span class="p">=</span><span class="s">true</span>
 <span class="py">quarkus.kubernetes.ingress.host</span><span class="p">=</span><span class="s">student.cloud.htl-leonding.ac.at</span>
-<span class="py">quarkus.kubernetes.ports.http.path</span><span class="p">=</span><span class="s">/my-first-app(/|$)(.*)$</span>
+<span class="c"># leocloud-prefix
+</span><span class="py">quarkus.kubernetes.ports.http.path</span><span class="p">=</span><span class="s">/t.stuetz(/|$)(.*)$</span>
 
-<span class="c"># für debuggen
-</span><span class="py">quarkus.http.access-log.enabled</span><span class="p">=</span><span class="s">true</span>
+<span class="c"># leocloud-prefix
+</span><span class="py">quarkus.http.root-path</span><span class="p">=</span><span class="s">t.stuetz</span>
 
-<span class="py">quarkus.http.root-path</span><span class="p">=</span><span class="s">my-first-app</span></code></pre>
+<span class="c"># für debuggen (requests werden in quarkus log angezeigt)
+</span><span class="py">quarkus.http.access-log.enabled</span><span class="p">=</span><span class="s">true</span></code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -833,10 +985,10 @@ Login Succeeded</pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_create_and_push_the_container_image_using_jib"><a class="anchor" href="#_create_and_push_the_container_image_using_jib"></a>4. Create and Push the Container Image using Jib</h2>
+<h2 id="_create_and_push_the_container_image_using_jib"><a class="anchor" href="#_create_and_push_the_container_image_using_jib"></a>7. Create and Push the Container Image using Jib</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_push_docker_image_into_docker_registry_jar"><a class="anchor" href="#_push_docker_image_into_docker_registry_jar"></a>4.1. Push Docker Image into Docker Registry (jar)</h3>
+<h3 id="_push_docker_image_into_docker_registry_jar"><a class="anchor" href="#_push_docker_image_into_docker_registry_jar"></a>7.1. Push Docker Image into Docker Registry (jar)</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash">./mvnw clean package <span class="nt">-DskipTests</span> <span class="nt">-Dquarkus</span>.container-image.push<span class="o">=</span><span class="nb">true</span></code></pre>
@@ -905,7 +1057,7 @@ Login Succeeded</pre>
 </details>
 </div>
 <div class="sect2">
-<h3 id="_make_docker_image_in_package_public"><a class="anchor" href="#_make_docker_image_in_package_public"></a>4.2. Make Docker Image in Package public</h3>
+<h3 id="_make_docker_image_in_package_public"><a class="anchor" href="#_make_docker_image_in_package_public"></a>7.2. Make Docker Image in Package public</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -964,7 +1116,7 @@ Login Succeeded</pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_deploy_your_application_to_your_kubernetes_cluster"><a class="anchor" href="#_deploy_your_application_to_your_kubernetes_cluster"></a>5. Deploy your application to your Kubernetes cluster</h2>
+<h2 id="_deploy_your_application_to_your_kubernetes_cluster"><a class="anchor" href="#_deploy_your_application_to_your_kubernetes_cluster"></a>8. Deploy your application to your Kubernetes cluster</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
@@ -979,7 +1131,7 @@ deployment.apps/primer-leocloud created</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_delete_your_cluster"><a class="anchor" href="#_delete_your_cluster"></a>5.1. Delete your Cluster</h3>
+<h3 id="_delete_your_cluster"><a class="anchor" href="#_delete_your_cluster"></a>8.1. Delete your Cluster</h3>
 <div class="listingblock">
 <div class="content">
 <pre>kubectl delete -f target/kubernetes/kubernetes.yml</pre>
@@ -989,7 +1141,7 @@ deployment.apps/primer-leocloud created</pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_zugriff_auf_die_app"><a class="anchor" href="#_zugriff_auf_die_app"></a>6. Zugriff auf die App</h2>
+<h2 id="_zugriff_auf_die_app"><a class="anchor" href="#_zugriff_auf_die_app"></a>9. Zugriff auf die App</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
@@ -1006,7 +1158,7 @@ primer-leocloud-86dd7864f4-7xllm        1/1     Running   0          16m   10.24
 </div>
 </div>
 <div class="sect1">
-<h2 id="_neu_kompilieren_bauen_und_deployen"><a class="anchor" href="#_neu_kompilieren_bauen_und_deployen"></a>7. Neu kompilieren, bauen und deployen</h2>
+<h2 id="_neu_kompilieren_bauen_und_deployen"><a class="anchor" href="#_neu_kompilieren_bauen_und_deployen"></a>10. Neu kompilieren, bauen und deployen</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
@@ -1016,7 +1168,7 @@ primer-leocloud-86dd7864f4-7xllm        1/1     Running   0          16m   10.24
 </div>
 </div>
 <div class="sect1">
-<h2 id="_sources"><a class="anchor" href="#_sources"></a>8. Sources</h2>
+<h2 id="_sources"><a class="anchor" href="#_sources"></a>11. Sources</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -1042,7 +1194,7 @@ primer-leocloud-86dd7864f4-7xllm        1/1     Running   0          16m   10.24
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-11-09 23:01:52 UTC
+Last updated 2022-11-16 16:23:20 UTC
 </div>
 </div>
 </body>
