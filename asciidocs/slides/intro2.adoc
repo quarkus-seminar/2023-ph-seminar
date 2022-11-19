@@ -101,8 +101,12 @@ image::intro/duke_superhero.png[width=700]
 
 == Dead Code Elimination
 
-.https://dev.to/pierregmn/quarkus-fundamentals-n77[Pierre Guimon - Quarkus fundamentals,2022^]
 image::quarkus-dead-code-elimination.png[]
+
+[.refs]
+--
+https://dev.to/pierregmn/quarkus-fundamentals-n77[Pierre Guimon - Quarkus fundamentals,2022^]
+--
 
 ////
 == Wenig Speicherbedarf
