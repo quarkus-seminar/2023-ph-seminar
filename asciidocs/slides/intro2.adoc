@@ -6,7 +6,6 @@
 :revremark: SCHILF @ HTL Leonding
 :encoding: utf-8
 :lang: de
-:imgesdir: images
 :doctype: article
 :icons: font
 :customcss: css/presentation.css
@@ -23,6 +22,12 @@
 :iconfont-name: fonts/fontawesome/css/all
 //:revealjs_parallaxBackgroundImage: background-landscape-light-orange.jpg
 //:revealjs_parallaxBackgroundSize: 4936px 2092px
+ifdef::env-ide[]
+:imagesdir: ../images
+endif::[]
+ifndef::env-ide[]
+:imagesdir: images
+endif::[]
 
 //:numbered:
 
@@ -94,10 +99,16 @@ image::intro/04-traditional-java.png[background, size="contain"]
 
 image::intro/duke_superhero.png[width=700]
 
+== Dead Code Elimination
 
+.https://dev.to/pierregmn/quarkus-fundamentals-n77[Pierre Guimon - Quarkus fundamentals,2022^]
+image::quarkus-dead-code-elimination.png[]
+
+////
 == Wenig Speicherbedarf
 
 * Build-time-optimization
+
 
 image::intro/build-time-optimizing.png[link=https://jax.de/blog/schneller-als-der-schall,width=800^]
 
@@ -119,10 +130,16 @@ image:intro/create-native-image.png[width=800]
 ** Die Start-up-Zeit sinkt in den Bereich von Millisekunden.
 --
 
+////
 
 == Kurze Startzeiten
 
-image::intro/startup-phases.png[]
+//https://res.cloudinary.com/practicaldev/image/fetch/s--VBGwnUCq--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://user-images.githubusercontent.com/55956993/144471998-db527b7b-5d47-489d-a812-6eeafe1e9112.png
+.https://dev.to/pierregmn/quarkus-fundamentals-n77[Pierre Guimon - Quarkus fundamentals, 2022^]
+image::quarkus-from-runtime-to-buildtime.png[]
+
+//image::intro/startup-phases.png[]
+
 
 * https://www.infoq.com/articles/native-java-quarkus/[Kubernetes Native Java with Quarkus, 2022^]
 
@@ -140,6 +157,17 @@ image::intro/startup-phases.png[]
 Reactive Systems in Java, o’Reilly S.44
 --
 ////
+
+
+== Optimized Jar or Native Build
+
+// .https://dev.to/pierregmn/quarkus-fundamentals-n77[Pierre Guimon - Quarkus fundamentals,2022^]
+image::quarkus-build-process.png[]
+
+[.refs]
+--
+https://dev.to/pierregmn/quarkus-fundamentals-n77[Pierre Guimon - Quarkus fundamentals,2022^]
+--
 
 
 == Modular aufgebaut

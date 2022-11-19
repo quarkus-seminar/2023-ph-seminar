@@ -30,3 +30,5 @@ TIP: Das ist ein Test
 * https://quarkus.io/blog/quarkus-superheroes-to-the-rescue/[2022 - Quarkus Superheroes to the Rescue!]
 
 * https://jax.de/blog/schneller-als-der-schall/[2022 - Schneller als der Schall: Ist Quarkus die Zukunft von Enterprise Java für die Cloud?]
+
+* https://dev.to/pierregmn/quarkus-fundamentals-n77[2022 - Quarkus fundamentals (Pierre Guimon)]
