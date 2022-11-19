@@ -454,7 +454,7 @@ image::cont-testing-01.png[]
 
 * A second testcontainer was startet (test-profile), so the data in the dev-profile is not affected.
 
-image::cont-testing-02-second-testcontainer.png[width=400]
+image::cont-testing-02-second-testcontainer.png[]
 
 
 .we are using test-driven-development
