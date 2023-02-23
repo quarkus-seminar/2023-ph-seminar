@@ -60,19 +60,19 @@ image::intro/senkrechtstarter-quarkus-2.jpeg[background, size="contain"]
 [%notitle]
 == Was bauen wir - 1
 
-image::overview-1.png[]
+image::overview-1.png[background, size="cover"]
 
 
 [%notitle]
 == Was bauen wir - 2
 
-image::overview-2.png[]
+image::overview-2.png[background, size="cover"]
 
 
 [%notitle]
 == Was bauen wir - 3
 
-image::overview-3.png[]
+image::overview-3.png[background, size="cover"]
 
 
 == Timeline
