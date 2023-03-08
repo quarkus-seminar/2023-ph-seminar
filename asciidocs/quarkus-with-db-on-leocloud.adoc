@@ -1,0 +1,324 @@
+= Deploy Quarkus App with db on k8s
+:icons: font
+:experimental:
+:imagesdir: images
+//Need this blank line after ifdef, don't know why...
+ifdef::backend-html5[]
+
+// https://fontawesome.com/v4.7.0/icons/
+icon:file-text-o[link=https://raw.githubusercontent.com/quarkus-seminar/2023-ph-seminar/main/asciidocs/{docname}.adoc] ‏ ‏ ‎
+icon:github-square[link=https://github.com/quarkus-seminar/2023-ph-seminar] ‏ ‏ ‎
+icon:home[link=http://edufs.edu.htl-leonding.ac.at/~t.stuetz/hugo/2021/01/technology-notes/]
+endif::backend-html5[]
+
+
+== Precondition
+
+* Docker should be installed.
+
+
+
+
+
+== Demo-Code and http-requests
+
+image::primer-leocloud-democode.png[]
+
+* run it with `./mvnw clean quarkus:dev`
+
+* use requests.http
+** `GET http://localhost:8080`
+** `GET http://localhost:8080/hello`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////
+
+== Install kubernetes extension
+
+.Liste aller Extensions
+----
+./mvnw quarkus:list-extensions
+----
+
+.Installieren der benötigten Extensions
+----
+./mvnw quarkus:add-extension -Dextensions="kubernetes,jib"
+----
+
+== Docker-Image-Registry
+
+=== Erstellen eines Zugriffstokens
+
+. Öffnen von https://github.com
+. `Settings` - `<> Developer Settings` - `Personal Access Tokens` - `Tokens (classic)` - kbd:[Generate new token] - Generate new token (classic)
+
+. Give the token a name i.e. `ghcr-token`
+
+. Give a expiration date i.e. `90 days`
+
+. Check `write:packages` and `workflow`
++
+image::token-ghcr.png[]
+
+. Click kbd:[Generate token]
++
+image::token-ghcr2.png[]
+
+. Copy the token into a text-file
++
+image::token-ghcr3.png[]
+
+
+=== Login into Registry
+
+* Wir verwenden die github-registry!
+
+[source,bash]
+----
+docker login ghcr.io
+----
+
+.output
+----
+Username: t.stuetz@htl-leonding.ac.at # <.>
+Password: *********  # <.>
+Login Succeeded
+----
+
+<.> Use your github account name
+<.> For the password use the token
+
+
+== Config Quarkus App
+
+[source,properties]
+----
+# github-account-name
+quarkus.container-image.group=htl-leonding
+
+quarkus.container-image.name=primer-leocloud
+quarkus.container-image.tag=1.0.0
+
+# LeoCloud namespace
+quarkus.kubernetes.namespace=student-t-stuetz
+
+# docker registry
+quarkus.container-image.registry=ghcr.io
+
+
+# ingress
+quarkus.kubernetes.ingress.expose=true
+quarkus.kubernetes.ingress.host=student.cloud.htl-leonding.ac.at
+# leocloud-prefix
+quarkus.kubernetes.ports.http.path=/t.stuetz(/|$)(.*)$
+
+# leocloud-prefix
+quarkus.http.root-path=t.stuetz
+
+# für debuggen (requests werden in quarkus log angezeigt)
+quarkus.http.access-log.enabled=true
+----
+
+* https://dev.to/pavanbelagatti/kubernetes-service-types-explained-207g[Kubernetes Service Types Explained^]
+
+== Create and Push the Container Image using Jib
+
+=== Push Docker Image into Docker Registry (jar)
+
+[source,bash]
+----
+./mvnw clean package -DskipTests -Dquarkus.container-image.push=true
+----
+
+.output
+[%collapsible]
+====
+----
+[INFO] Scanning for projects...
+[INFO]
+[INFO] -----------------------< at.htl:primer-leocloud >-----------------------
+[INFO] Building primer-leocloud 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ primer-leocloud ---
+[INFO] Deleting /Users/stuetz/work/2023-ph-seminar/labs/primer-leocloud/target
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ primer-leocloud ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 2 resources
+[INFO]
+[INFO] --- quarkus-maven-plugin:2.13.3.Final:generate-code (default) @ primer-leocloud ---
+[INFO]
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ primer-leocloud ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to /Users/stuetz/work/2023-ph-seminar/labs/primer-leocloud/target/classes
+[INFO]
+[INFO] --- quarkus-maven-plugin:2.13.3.Final:generate-code-tests (default) @ primer-leocloud ---
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ primer-leocloud ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/stuetz/work/2023-ph-seminar/labs/primer-leocloud/src/test/resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ primer-leocloud ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 2 source files to /Users/stuetz/work/2023-ph-seminar/labs/primer-leocloud/target/test-classes
+[INFO]
+[INFO] --- maven-surefire-plugin:3.0.0-M7:test (default-test) @ primer-leocloud ---
+[INFO] Tests are skipped.
+[INFO]
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ primer-leocloud ---
+[INFO] Building jar: /Users/stuetz/work/2023-ph-seminar/labs/primer-leocloud/target/primer-leocloud-1.0-SNAPSHOT.jar
+[INFO]
+[INFO] --- quarkus-maven-plugin:2.13.3.Final:build (default) @ primer-leocloud ---
+[INFO] Checking for existing resources in: /Users/stuetz/work/2023-ph-seminar/labs/primer-leocloud/src/main/kubernetes.
+[INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Starting (local) container image build for jar using jib.
+[WARNING] [io.quarkus.container.image.jib.deployment.JibProcessor] Base image 'registry.access.redhat.com/ubi8/openjdk-17-runtime:1.14' does not use a specific image digest - build may not be reproducible
+[INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] LogEvent [level=INFO, message=trying docker-credential-desktop for registry.cloud.htl-leonding.ac.at]
+[INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] LogEvent [level=LIFECYCLE, message=Using credentials from Docker config (/Users/stuetz/.docker/config.json) for registry.cloud.htl-leonding.ac.at/t.stuetz/primer-leocloud:1.0.0]
+[INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Using base image with digest: sha256:43618c504657b12e121945ad6c52ce426758fbd2158b820a9fc5babd2970bdde
+[INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Container entrypoint set to [java, -Djava.util.logging.manager=org.jboss.logmanager.LogManager, -jar, quarkus-run.jar]
+[INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Pushed container image registry.cloud.htl-leonding.ac.at/t.stuetz/primer-leocloud:1.0.0 (sha256:7ba60a294b437f9053c840c135eb449b30b40e677272288d069d3f34269bfbef)
+
+[INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 67824ms
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:09 min
+[INFO] Finished at: 2022-11-06T18:22:50+01:00
+[INFO] ------------------------------------------------------------------------
+----
+====
+
+////
+
+=== Push Docker Image into Docker Registry (native)
+
+* Könnte sein, dass das nur funktioniert, wenn Architektur von Entwicklermaschine und k8s ident ist (amd64 oder arm64)
+
+* Zuerst muss man sich das korrekte Image zur jeweiligen Rechnerarchitekur heraussuchen -> https://quay.io/repository/quarkus/ubi-quarkus-mandrel-builder-image?tab=tags[quay.io^]
+
+[source,bash]
+----
+./mvnw clean install -DskipTests -Dnative \
+       -Dquarkus.container-image.push=true \
+       -Dquarkus.native.container-build=true \
+       -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-mandrel-builder-image:22.3.0.1-Final-java17-arm64
+----
+
+////
+
+=== Make Docker Image in Package public
+
+* https://github.com
+* go to the repositories tab
+* click the `Packages`-tab
+
+image::packages-in-github.png[]
+
+* click your package
+
+* click `Package settings`
+
+image::packages-in-github-2.png[]
+
+* Click kbd:[Change visibility] in "Danger Zone"
+
+* Check `Public`
+
+* Confirm package name
+
+* Click kbd:[I understand the consequences; change package visibility]
+
+image::packages-in-github-3.png[]
+
+
+
+== Deploy your application to your Kubernetes cluster
+
+[source,bash]
+----
+kubectl apply -f target/kubernetes/kubernetes.yaml
+----
+
+.output
+----
+service/primer-leocloud created
+deployment.apps/primer-leocloud created
+----
+
+=== Delete your Cluster
+
+----
+kubectl delete -f target/kubernetes/kubernetes.yml
+----
+
+
+== Zugriff auf die App
+
+[source,bash]
+----
+kubectl get pod -o wide
+----
+
+----
+NAME                                    READY   STATUS    RESTARTS   AGE   IP             NODE   NOMINATED NODE   READINESS GATES
+kubernetes-dashboard-6db7c545bb-j9lzq   1/1     Running   0          38d   10.244.1.28    hulk   <none>           <none>
+primer-leocloud-86dd7864f4-7xllm        1/1     Running   0          16m   10.244.1.204   hulk   <none>           <none>
+----
+
+== Neu kompilieren, bauen und deployen
+
+----
+./mvnw clean package -Dquarkus.kubernetes.deploy=true
+----
+
+
+
+== Sources
+
+* https://caberger.github.io/leocloud/[LeoCloud^]
+* https://redhat-developer-demos.github.io/quarkus-tutorial/quarkus-tutorial/kubernetes.html[^]
+* https://cloud.htl-leonding.ac.at[^]
+* https://dev.to/pavanbelagatti/kubernetes-service-types-explained-207g[Kubernetes Service Types Explained ^]
+* https://medium.com/avmconsulting-blog/service-types-in-kubernetes-24a1587677d6[Service Types in Kubernetes?^]
