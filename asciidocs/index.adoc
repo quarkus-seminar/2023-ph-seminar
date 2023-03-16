@@ -98,6 +98,218 @@ source <(kubectl completion zsh)  # set up autocomplete in zsh into the current 
 echo '[[ $commands[kubectl] ]] && source <(kubectl completion zsh)' >> ~/.zshrc # add autocomplete permanently to your zsh shell
 ----
 
+.Namespace fix einstellen
+----
+ kubectl config set-context --current --namespace=demo-namespace
+kubectl get namespaces
+kubectl get pods
+----
+
+* Man darf sich nicht für Kleinigkeiten ein neues Docker-Image bauen
+
+* Man sollte immer ein Standard Image zB für postgres verwenden und dieses konfigurieren
+
+* https://github.com/docker-library/postgres/tree/ef45b990868d5a0053bd30fdbae36551b46b76c9/15/bullseye[Dockerfile für Postgres xxx]
+
+==== ConfigMaps
+
+* Key-Value-Maps zur Konfiguration dieser Images
+
+k8s/postgres.yaml
+[source,yaml]
+----
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-setup
+
+data:
+  setup.sql: |
+    DROP database if exists demo;
+    DROP user if exists demo;
+    CREATE USER demo WITH
+      LOGIN
+      NOSUPERUSER
+      NOCREATEDB
+      NOCREATEROLE
+      INHERIT
+      NOREPLICATION
+      CONNECTION LIMIT -1
+      PASSWORD 'demo';
+
+    CREATE DATABASE demo
+        WITH
+        OWNER = demo
+        ENCODING = 'UTF8'
+        CONNECTION LIMIT = -1;
+  allow-all.sh: |
+    echo "allow all hosts..."
+    echo "host all  all    0.0.0.0/0  md5" >> /var/lib/postgresql/data/pg_hba.conf
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-data
+
+  annotations:
+    nfs.io/storage-path: "postgresql-data"
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-admin
+
+type: kubernetes.io/basic-auth
+stringData:
+  username: demo
+  password: demo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+
+  labels:
+    component: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: postgres
+          image: postgres:14
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+              name: postgres
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            - name: setup-scripts
+              mountPath: /docker-entrypoint-initdb.d/setup.sql
+              subPath: setup.sql
+              readOnly: true
+            - name: allowall
+              mountPath: /docker-entrypoint-initdb.d/allow-all.sh
+              subPath: allow-all.sh
+              readOnly: true
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-admin
+                  key: password
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgresql-data
+        - name: setup-scripts
+          configMap:
+            name: postgres-setup
+            items:
+              - key: setup.sql
+                path: setup.sql
+        - name: allowall
+          configMap:
+            name: postgres-setup
+            items:
+              - key: allow-all.sh
+                path: allow-all.sh
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    component: postgres
+----
+
+----
+kubectl apply -f postgres.yaml
+----
+
+Um auf die DB zuzugreifen, verwendet man port-forwarding
+
+* Schauen, wie der Pod heißt
+
+----
+kubectl get pods
+----
+
+----
+NAME                        READY   STATUS    RESTARTS   AGE
+postgres-5468d5c66c-78lcv   1/1     Running   0          12m
+----
+
+
+----
+kubectl port-forward postgres-5468d5c66c-78lcv 5432:5432
+----
+
+* Das Terminal verliert Fokus
+
+* Neues Terminal öffnen und kontrollieren:
+
+----
+netstat -ant | grep 5432
+----
+
+image::datasource-mit-k8s.png[]
+
+
+image::port-forwarding-in-intellij.png[]
+
+[source,properties]
+----
+# datasource configuration
+quarkus.datasource.db-kind = postgresql
+quarkus.datasource.username = demo
+quarkus.datasource.password = demo
+%dev.quarkus.datasource.jdbc.url = jdbc:postgresql://localhost:5432/demo
+%prod.quarkus.datasource.jdbc.url = jdbc:postgresql://postgres:5432/db
+
+# drop and create the database at startup (use `update` to only update the schema)
+quarkus.hibernate-orm.database.generation=drop-and-create
+
+quarkus.hibernate-orm.log.sql=true
+%dev.quarkus.hibernate-orm.sql-load-script=db/import.sql
+----
+
+
+* für entwickeln verwenden wir immer "latest" und "imagePullPolicy: Always"
+* erst in der Produktion wird eine Version vergeben und die imagePullPolicy wird entfernt
+
+
+
+
+
+
 
 
 
