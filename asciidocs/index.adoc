@@ -306,6 +306,62 @@ quarkus.hibernate-orm.log.sql=true
 * erst in der Produktion wird eine Version vergeben und die imagePullPolicy wird entfernt
 
 
+=== Docker-Image in die ghcr.io pushen
+
+==== Secret erstellen
+
+* github.com - Settings - Developer Settings - Personal Access Tokens - Tokens (classic)
+
+image::create-secret.png[]
+
+* Erstelltes Token in Editor kopieren
+
+==== Mit Docker CLI in ghcr.io einloggen
+
+----
+docker login ghcr.io
+----
+
+.output
+----
+Username: htl-leonding
+Password: <token einfügen>
+Login Succeeded
+----
+
+==== Docker Image taggen
+
+----
+docker image tag busybox ghcr.io/htl-leonding/my-busybox:latest
+----
+
+==== Docker Image ins ghcr.io pushen
+
+----
+docker push ghcr.io/htl-leonding/my-busybox:latest
+----
+
+.output
+----
+The push refers to repository [ghcr.io/htl-leonding/my-busybox]
+5f5f687a05d8: Pushed
+latest: digest: sha256:afebab8e3d8cbef70c0632b5a7aa5c003f253d4f4f1ca47fe6b094ef7fe0cd07 size: 528
+----
+
+
+==== Kontrollieren, ob Image in ghcr.io
+
+----
+https://github.com/htl-leonding?tab=packages
+----
+
+
+
+
+
+
+
+
 
 
 
