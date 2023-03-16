@@ -1,4 +1,13 @@
 = Quarkus-Seminar
+Christian Aberger & Thomas W. Stütz
+1.0.0, {docdate}: Softwareentwicklung
+ifndef::imagesdir[:imagesdir: images]
+//:toc-placement!:  // prevents the generation of the doc at this position, so it can be printed afterwards
+:sourcedir: ../src/main/java
+:icons: font
+:sectnums:    // Nummerierung der Überschriften / section numbering
+:toc: left
+:experimental:
 
 
 == Tag 1
@@ -8,3 +17,88 @@
 * https://bit.ly/[https://htl-leonding-college.github.io/quarkus-lecture-notes/^]
 * https://github.com/htl-leonding/vehicle[vehicle-github-repo^]
 * https://medium.com/sahibinden-technology/package-by-layer-vs-package-by-feature-7e89cde2ae3a[Package by Layer vs Package by Feature^]
+
+
+
+== Tag 2
+
+=== Mapping von Entities
+
+==== Dto
+
+* reine Transfer Objekte
+
+
+* Frage:
+** ansehen der Constraints für PK in postgres (nullable?)
+
+** Performance bei DevServices für Datenbanken
+
+
+=== Panache
+
+* https://quarkus.io/guides/hibernate-orm-panache
+
+=== Dev Services
+
+* https://quarkus.io/guides/dev-services
+
+
+=== AssertJ-Core
+
+* https://assertj.github.io/doc/#assertj-core
+
+=== AssertJ-DB
+
+* https://assertj.github.io/doc/#assertj-db
+
+
+
+=== Minikube installieren
+
+----
+brew install minikube
+brew install kubectl
+----
+
+
+----
+minikube start
+minikube addons list
+minikube addons enable dashboard
+minikube addons enable metrics-server
+kubectl get nodes
+minikube dashboard
+----
+
+.namespace.yaml
+[source,yaml]
+----
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-namespace
+----
+
+----
+cd k8s
+kubectl apply -f namespace.yaml
+----
+
+.output
+----
+namespace/demo-namespace created
+----
+
+* https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+
+.autocomplete für Kubectl enablen
+----
+source <(kubectl completion zsh)  # set up autocomplete in zsh into the current shell
+echo '[[ $commands[kubectl] ]] && source <(kubectl completion zsh)' >> ~/.zshrc # add autocomplete permanently to your zsh shell
+----
+
+
+
+
+

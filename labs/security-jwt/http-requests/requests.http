@@ -1,0 +1,11 @@
+GET http://localhost:8080/api/secured/permit-all
+
+###
+
+GET http://localhost:8080/api/secured/roles-allowed
+
+###
+
+GET http://localhost:8080/api
+Authorization: Basic hansi passme
+
