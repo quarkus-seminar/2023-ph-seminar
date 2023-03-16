@@ -574,6 +574,7 @@ pre.rouge .gs {
 <li><a href="#_assertj_core">2.4. AssertJ-Core</a></li>
 <li><a href="#_assertj_db">2.5. AssertJ-DB</a></li>
 <li><a href="#_minikube_installieren">2.6. Minikube installieren</a></li>
+<li><a href="#_docker_image_in_die_ghcr_io_pushen">2.7. Docker-Image in die ghcr.io pushen</a></li>
 </ul>
 </li>
 </ul>
@@ -977,13 +978,86 @@ postgres-5468d5c66c-78lcv   1/1     Running   0          12m</pre>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_docker_image_in_die_ghcr_io_pushen"><a class="anchor" href="#_docker_image_in_die_ghcr_io_pushen"></a>2.7. Docker-Image in die ghcr.io pushen</h3>
+<div class="sect3">
+<h4 id="_secret_erstellen"><a class="anchor" href="#_secret_erstellen"></a>2.7.1. Secret erstellen</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>github.com - Settings - Developer Settings - Personal Access Tokens - Tokens (classic)</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/create-secret.png" alt="create secret">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Erstelltes Token in Editor kopieren</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mit_docker_cli_in_ghcr_io_einloggen"><a class="anchor" href="#_mit_docker_cli_in_ghcr_io_einloggen"></a>2.7.2. Mit Docker CLI in ghcr.io einloggen</h4>
+<div class="listingblock">
+<div class="content">
+<pre>docker login ghcr.io</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">output</div>
+<div class="content">
+<pre>Username: htl-leonding
+Password: &lt;token einfügen&gt;
+Login Succeeded</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_docker_image_taggen"><a class="anchor" href="#_docker_image_taggen"></a>2.7.3. Docker Image taggen</h4>
+<div class="listingblock">
+<div class="content">
+<pre>docker image tag busybox ghcr.io/htl-leonding/my-busybox:latest</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_docker_image_ins_ghcr_io_pushen"><a class="anchor" href="#_docker_image_ins_ghcr_io_pushen"></a>2.7.4. Docker Image ins ghcr.io pushen</h4>
+<div class="listingblock">
+<div class="content">
+<pre>docker push ghcr.io/htl-leonding/my-busybox:latest</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">output</div>
+<div class="content">
+<pre>The push refers to repository [ghcr.io/htl-leonding/my-busybox]
+5f5f687a05d8: Pushed
+latest: digest: sha256:afebab8e3d8cbef70c0632b5a7aa5c003f253d4f4f1ca47fe6b094ef7fe0cd07 size: 528</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_kontrollieren_ob_image_in_ghcr_io"><a class="anchor" href="#_kontrollieren_ob_image_in_ghcr_io"></a>2.7.5. Kontrollieren, ob Image in ghcr.io</h4>
+<div class="listingblock">
+<div class="content">
+<pre>https://github.com/htl-leonding?tab=packages</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 1.0.0<br>
-Last updated 2023-03-16 15:28:10 UTC
+Last updated 2023-03-16 16:32:02 UTC
 </div>
 </div>
 </body>
