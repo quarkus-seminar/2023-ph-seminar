@@ -726,6 +726,256 @@ kubectl apply -f namespace.yaml</pre>
 echo '[[ $commands[kubectl] ]] &amp;&amp; source &lt;(kubectl completion zsh)' &gt;&gt; ~/.zshrc # add autocomplete permanently to your zsh shell</pre>
 </div>
 </div>
+<div class="listingblock">
+<div class="title">Namespace fix einstellen</div>
+<div class="content">
+<pre> kubectl config set-context --current --namespace=demo-namespace
+kubectl get namespaces
+kubectl get pods</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Man darf sich nicht für Kleinigkeiten ein neues Docker-Image bauen</p>
+</li>
+<li>
+<p>Man sollte immer ein Standard Image zB für postgres verwenden und dieses konfigurieren</p>
+</li>
+<li>
+<p><a href="https://github.com/docker-library/postgres/tree/ef45b990868d5a0053bd30fdbae36551b46b76c9/15/bullseye">Dockerfile für Postgres xxx</a></p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_configmaps"><a class="anchor" href="#_configmaps"></a>2.6.1. ConfigMaps</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Key-Value-Maps zur Konfiguration dieser Images</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>k8s/postgres.yaml</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-setup</span>
+
+<span class="na">data</span><span class="pi">:</span>
+  <span class="na">setup.sql</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">DROP database if exists demo;</span>
+    <span class="s">DROP user if exists demo;</span>
+    <span class="s">CREATE USER demo WITH</span>
+      <span class="s">LOGIN</span>
+      <span class="s">NOSUPERUSER</span>
+      <span class="s">NOCREATEDB</span>
+      <span class="s">NOCREATEROLE</span>
+      <span class="s">INHERIT</span>
+      <span class="s">NOREPLICATION</span>
+      <span class="s">CONNECTION LIMIT -1</span>
+      <span class="s">PASSWORD 'demo';</span>
+
+    <span class="s">CREATE DATABASE demo</span>
+        <span class="s">WITH</span>
+        <span class="s">OWNER = demo</span>
+        <span class="s">ENCODING = 'UTF8'</span>
+        <span class="s">CONNECTION LIMIT = -1;</span>
+  <span class="na">allow-all.sh</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">echo "allow all hosts..."</span>
+    <span class="s">echo "host all  all    0.0.0.0/0  md5" &gt;&gt; /var/lib/postgresql/data/pg_hba.conf</span>
+<span class="s">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgresql-data</span>
+
+  <span class="na">annotations</span><span class="pi">:</span>
+    <span class="na">nfs.io/storage-path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">postgresql-data"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteMany</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">standard</span>
+  <span class="na">resources</span><span class="pi">:</span>
+    <span class="na">requests</span><span class="pi">:</span>
+      <span class="na">storage</span><span class="pi">:</span> <span class="s">100Mi</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Secret</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-admin</span>
+
+<span class="na">type</span><span class="pi">:</span> <span class="s">kubernetes.io/basic-auth</span>
+<span class="na">stringData</span><span class="pi">:</span>
+  <span class="na">username</span><span class="pi">:</span> <span class="s">demo</span>
+  <span class="na">password</span><span class="pi">:</span> <span class="s">demo</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres</span>
+
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">component</span><span class="pi">:</span> <span class="s">postgres</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">component</span><span class="pi">:</span> <span class="s">postgres</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">component</span><span class="pi">:</span> <span class="s">postgres</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">restartPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">30</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">postgres</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">postgres:14</span>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">5432</span>
+              <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">postgres</span>
+          <span class="na">readinessProbe</span><span class="pi">:</span>
+            <span class="na">tcpSocket</span><span class="pi">:</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">5432</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">20</span>
+            <span class="na">periodSeconds</span><span class="pi">:</span> <span class="m">30</span>
+          <span class="na">volumeMounts</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-data</span>
+              <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/postgresql/data</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">setup-scripts</span>
+              <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/docker-entrypoint-initdb.d/setup.sql</span>
+              <span class="na">subPath</span><span class="pi">:</span> <span class="s">setup.sql</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allowall</span>
+              <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/docker-entrypoint-initdb.d/allow-all.sh</span>
+              <span class="na">subPath</span><span class="pi">:</span> <span class="s">allow-all.sh</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">POSTGRES_PASSWORD</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">secretKeyRef</span><span class="pi">:</span>
+                  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-admin</span>
+                  <span class="na">key</span><span class="pi">:</span> <span class="s">password</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-data</span>
+          <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+            <span class="na">claimName</span><span class="pi">:</span> <span class="s">postgresql-data</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">setup-scripts</span>
+          <span class="na">configMap</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-setup</span>
+            <span class="na">items</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">setup.sql</span>
+                <span class="na">path</span><span class="pi">:</span> <span class="s">setup.sql</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allowall</span>
+          <span class="na">configMap</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-setup</span>
+            <span class="na">items</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">allow-all.sh</span>
+                <span class="na">path</span><span class="pi">:</span> <span class="s">allow-all.sh</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres</span>
+
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">5432</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">5432</span>
+      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">component</span><span class="pi">:</span> <span class="s">postgres</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl apply -f postgres.yaml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Um auf die DB zuzugreifen, verwendet man port-forwarding</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Schauen, wie der Pod heißt</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl get pods</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>NAME                        READY   STATUS    RESTARTS   AGE
+postgres-5468d5c66c-78lcv   1/1     Running   0          12m</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl port-forward postgres-5468d5c66c-78lcv 5432:5432</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Das Terminal verliert Fokus</p>
+</li>
+<li>
+<p>Neues Terminal öffnen und kontrollieren:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>netstat -ant | grep 5432</pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/datasource-mit-k8s.png" alt="datasource mit k8s">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/port-forwarding-in-intellij.png" alt="port forwarding in intellij">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="c"># datasource configuration
+</span><span class="py">quarkus.datasource.db-kind</span> <span class="p">=</span> <span class="s">postgresql</span>
+<span class="py">quarkus.datasource.username</span> <span class="p">=</span> <span class="s">demo</span>
+<span class="py">quarkus.datasource.password</span> <span class="p">=</span> <span class="s">demo</span>
+<span class="err">%</span><span class="py">dev.quarkus.datasource.jdbc.url</span> <span class="p">=</span> <span class="s">jdbc:postgresql://localhost:5432/demo</span>
+<span class="err">%</span><span class="py">prod.quarkus.datasource.jdbc.url</span> <span class="p">=</span> <span class="s">jdbc:postgresql://postgres:5432/db</span>
+
+<span class="c"># drop and create the database at startup (use `update` to only update the schema)
+</span><span class="py">quarkus.hibernate-orm.database.generation</span><span class="p">=</span><span class="s">drop-and-create</span>
+
+<span class="py">quarkus.hibernate-orm.log.sql</span><span class="p">=</span><span class="s">true</span>
+<span class="err">%</span><span class="py">dev.quarkus.hibernate-orm.sql-load-script</span><span class="p">=</span><span class="s">db/import.sql</span></code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>für entwickeln verwenden wir immer "latest" und "imagePullPolicy: Always"</p>
+</li>
+<li>
+<p>erst in der Produktion wird eine Version vergeben und die imagePullPolicy wird entfernt</p>
+</li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -733,7 +983,7 @@ echo '[[ $commands[kubectl] ]] &amp;&amp; source &lt;(kubectl completion zsh)' &
 <div id="footer">
 <div id="footer-text">
 Version 1.0.0<br>
-Last updated 2023-03-16 14:30:21 UTC
+Last updated 2023-03-16 15:28:10 UTC
 </div>
 </div>
 </body>
