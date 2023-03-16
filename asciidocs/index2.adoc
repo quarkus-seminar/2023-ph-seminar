@@ -1,0 +1,88 @@
+= Contents
+
+
+== Tag 1
+
+* grober Überblick Ökosystem (1h)
+** https://pypl.github.io/PYPL.html
+** https://insights.stackoverflow.com/survey/2021#overview (im Vergleich zu 2020 fällt c# zurück) bzw. https://insights.stackoverflow.com/survey/2021#section-most-popular-technologies-programming-scripting-and-markup-languages[Programming, scripting, and markup languages^]
+
+
+** Cloud Computing / Serverless als (kommendes) Paradigma
+*** Abgrenzung zu Google Drive, OneDrive usw
+*** Abgrenzung zu (Hetzner-)Server
+** Jakarta EE und die Probleme mit der Cloud
+** Konkurrenten Helidon
+
+** Herausforderung:
+*** In der Schule ganz klein beginnen
+*** Deployment in die Cloud nur wahlweise
+*** ...
+
+** Grafik
+*** einmal JakartaEE ApplicationServer mit allen Libraries
+*** einmal microprofile mit einem File
+
+
+* Vorherrschende Architektur
+
+** Backend + beliebiges Frontend
+** vorwiegend REST, ev graphQL
+
+
+* Lab 1: Vorbereiten der Arbeitsumgebung (1h - bis Mittag)
+
+** Intellij (Tom 20 Lizenzen vorbereiten)
+** VSC (Chris gibt Liste aller Plugins)
+
+** Installationsanleitung für alle Betriebsystem
+
+** Eine REST-Endpoint -> Sämtliche Clients erläutern
+
+* Lab 2: REST-Client Parade (1. Tag Nachmittag)
+
+* curl / httpie
+* Postman / Insomnia
+* IntelliJ  / VSC - Rest-Client
+* swagger-ui
+* Test-Client REST-assured
+
+
+* Lab 3: Entity + Database + REST (Ende 1. Tag + Anfang 2. Tag)
+
+** doppelt: JPA - Standard + Panache
+*** Grafik: Varianten von JPA + Panache
+
+== Tag 2
+
+* Wiederholen
+
+* fertigstellen Lab 3
+
+
+* Lab 4: Mehrere Tabellen
+
+* Lab 5: Rest-Client
+
+** jsonplaceholder
+
+* Lab 6: Websocket
+
+** Wenn in der Datenbank etwas geändert hat, werden die Clients informiert.
+** Fussball-DB: Neue Ergebnisse werden an die Clients übermittelt (URL)
+** Ergebnistabelle vom Fussball wird aktualisiert
+** native mit docker container
+
+== Tag 3
+
+Lab 7: gh-actions mit Deployment in minikube
+
+== TODO
+
+* Kleine Aufgaben zu jedem Kapitel überlegen
+* Hilferessourcen zusammenstellen (Link-Sammlung)
+
+
+
+
+
