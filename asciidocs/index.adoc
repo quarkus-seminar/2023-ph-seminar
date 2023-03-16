@@ -6,3 +6,4 @@
 * https://bit.ly/htl-leonding[^]
 * https://bit.ly/htl-leonding-scripts[^]
 * https://bit.ly/[https://htl-leonding-college.github.io/quarkus-lecture-notes/^]
+* https://github.com/htl-leonding/vehicle[vehicle-github-repo^]
