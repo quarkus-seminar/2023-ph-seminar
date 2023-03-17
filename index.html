@@ -581,6 +581,7 @@ pre.rouge .gs {
 <li><a href="#_neuerliches_deployment">2.11. Neuerliches Deployment</a></li>
 <li><a href="#_periodisches_überprüfen_der_healthiness_liveness_probe">2.12. Periodisches Überprüfen der Healthiness (Liveness Probe)</a></li>
 <li><a href="#_installieren_eines_reverse_proxy">2.13. Installieren eines Reverse-Proxy</a></li>
+<li><a href="#_creating_a_linux_executable_without_graalvm_installed">2.14. Creating a Linux executable without GraalVM installed</a></li>
 </ul>
 </li>
 </ul>
@@ -1549,15 +1550,25 @@ postgres-5468d5c66c-cxq7n   1/1     Running   0          101m</pre>
 <img src="images/busybox-als-pod-und-job.png" alt="busybox als pod und job">
 </div>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre>http://localhost:4200/</pre>
-</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://localhost:4200/" class="bare">http://localhost:4200/</a></p>
+</li>
+</ul>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="images/busy-box-web-page.png" alt="busy box web page">
 </div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_creating_a_linux_executable_without_graalvm_installed"><a class="anchor" href="#_creating_a_linux_executable_without_graalvm_installed"></a>2.14. Creating a Linux executable without GraalVM installed</h3>
+<div class="listingblock">
+<div class="content">
+<pre>./mvnw install -Dnative -DskipTests -Dquarkus.native.container-build=true</pre>
 </div>
 </div>
 </div>
@@ -1567,7 +1578,7 @@ postgres-5468d5c66c-cxq7n   1/1     Running   0          101m</pre>
 <div id="footer">
 <div id="footer-text">
 Version 1.0.0<br>
-Last updated 2023-03-17 09:19:27 UTC
+Last updated 2023-03-17 09:44:40 UTC
 </div>
 </div>
 </body>
