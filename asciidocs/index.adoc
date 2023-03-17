@@ -739,10 +739,15 @@ kubectl apply -f busybox-job.yaml
 image::busybox-als-pod-und-job.png[]
 
 
-----
-http://localhost:4200/
-----
+* http://localhost:4200/
+
 
 image::busy-box-web-page.png[]
 
+
+=== Creating a Linux executable without GraalVM installed
+
+----
+./mvnw install -Dnative -DskipTests -Dquarkus.native.container-build=true
+----
 
