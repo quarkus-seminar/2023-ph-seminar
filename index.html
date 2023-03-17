@@ -577,6 +577,7 @@ pre.rouge .gs {
 <li><a href="#_docker_image_in_die_ghcr_io_pushen">2.7. Docker-Image in die ghcr.io pushen</a></li>
 <li><a href="#_deployment_eines_vorhandenen_images_ins_minikube">2.8. Deployment eines vorhandenen Images ins Minikube</a></li>
 <li><a href="#_deployment_einer_quarkus_app_ins_minikube">2.9. Deployment einer Quarkus - App ins Minikube</a></li>
+<li><a href="#_hinzufügen_von_health_zur_quarkus_app">2.10. Hinzufügen von Health zur Quarkus App</a></li>
 </ul>
 </li>
 </ul>
@@ -1382,13 +1383,29 @@ kubectl apply -f postgres.yaml</pre>
 </ul>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_hinzufügen_von_health_zur_quarkus_app"><a class="anchor" href="#_hinzufügen_von_health_zur_quarkus_app"></a>2.10. Hinzufügen von Health zur Quarkus App</h3>
+<div class="listingblock">
+<div class="content">
+<pre>./mvnw quarkus:add-extension -Dextensions='smallrye-health'</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>    &lt;dependency&gt;
+      &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+      &lt;artifactId&gt;quarkus-smallrye-health&lt;/artifactId&gt;
+    &lt;/dependency&gt;</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 1.0.0<br>
-Last updated 2023-03-17 07:46:21 UTC
+Last updated 2023-03-17 07:53:19 UTC
 </div>
 </div>
 </body>
