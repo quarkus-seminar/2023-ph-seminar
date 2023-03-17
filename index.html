@@ -1490,6 +1490,76 @@ kubectl apply -f appsrv.yaml</pre>
 <pre>kubectl apply -f nginx.yaml</pre>
 </div>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>Port-Forward 4200:80 im nginx-pod</p>
+</li>
+<li>
+<p><a href="http://localhost:4200" class="bare">http://localhost:4200</a></p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_zugriff_auf_quarkus_über_nginx"><a class="anchor" href="#_zugriff_auf_quarkus_über_nginx"></a>2.13.1. Zugriff auf Quarkus über nginx</h4>
+<div class="listingblock">
+<div class="content">
+<pre>http://localhost:4200/api/q/health
+http://localhost:4200/api/vehicles</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_eröffen_einer_shell_am_nginx"><a class="anchor" href="#_eröffen_einer_shell_am_nginx"></a>2.13.2. Eröffen einer shell am nginx</h4>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl get pods</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>NAME                        READY   STATUS    RESTARTS   AGE
+appsrv-5f65b54df-w6rtx      1/1     Running   0          27m
+nginx-f88cd74d5-bgcqx       1/1     Running   0          6m36s
+postgres-5468d5c66c-cxq7n   1/1     Running   0          101m</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre> kubectl exec -it nginx-f88cd74d5-bgcqx -- bash</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Aus Security Gründen wurde der Volume Mount schreibgeschützt</p>
+</li>
+<li>
+<p>Daher spielen wir einen Busybox-Job ein</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl apply -f busybox-job.yaml</pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/busybox-als-pod-und-job.png" alt="busybox als pod und job">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>http://localhost:4200/</pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/busy-box-web-page.png" alt="busy box web page">
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1497,7 +1567,7 @@ kubectl apply -f appsrv.yaml</pre>
 <div id="footer">
 <div id="footer-text">
 Version 1.0.0<br>
-Last updated 2023-03-17 08:59:55 UTC
+Last updated 2023-03-17 09:19:27 UTC
 </div>
 </div>
 </body>
