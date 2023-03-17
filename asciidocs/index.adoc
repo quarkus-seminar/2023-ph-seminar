@@ -639,6 +639,16 @@ kubectl port-forward postgres-5468d5c66c-78lcv 5432:5432
 * Alternative: Verwendung des Shell-Scripts port-forward.sh
 
 
+=== Hinzufügen von Health zur Quarkus App
 
+----
+./mvnw quarkus:add-extension -Dextensions='smallrye-health'
+----
 
+----
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-health</artifactId>
+    </dependency>
+----
 
