@@ -631,10 +631,25 @@ spec:
 kubectl apply -f appsrv.yaml
 ----
 
-.Port Forwarding
+==== Port Forwarding
 ----
-kubectl port-forward postgres-5468d5c66c-78lcv 5432:5432
+kubectl get pods
 ----
+
+----
+NAME                        READY   STATUS    RESTARTS   AGE
+appsrv-8545fd6488-qckbw     1/1     Running   0          19m
+postgres-5468d5c66c-cxq7n   1/1     Running   0          34m
+----
+
+.den korrekten pod übernehmen (ev. kubectl port-for tab tab)
+----
+kubectl port-forward postgres-5468d5c66c-cxq7n 5432:5432
+----
+
+* das Terminal verliert den Fokus, es läuft der Prozess zum Port-Forwarding
+
+
 
 * Alternative: Verwendung des Shell-Scripts port-forward.sh
 
@@ -651,4 +666,39 @@ kubectl port-forward postgres-5468d5c66c-78lcv 5432:5432
       <artifactId>quarkus-smallrye-health</artifactId>
     </dependency>
 ----
+
+IMPORTANT: Zuerst lokal testen, dann in die Cloud deployen, dh wir verwenden die DB vom Minikube (port-forward nicht vergessen) und starten die quarkus app lokal
+
+
+----
+./mvnw clean quarkus:dev
+----
+
+=== Neuerliches Deployment
+
+* Zuerst neu kompilieren
+
+* Deployment lösschen (besser wäre ein sanfter Übergang mit rollout)
+
+----
+kubectl delete -f appsrv.yaml
+kubectl apply -f appsrv.yaml
+----
+
+=== Periodisches Überprüfen der Healthiness (Liveness Probe)
+
+* Einkommentieren im yaml File
+
+=== Installieren eines Reverse-Proxy
+
+* Auch hier verwenden wir ein bestehendes nginx-image
+** Das könnte zum Problem beim Deployment in eine kommerzielle Cloud werden, da ein ReadWriteMany VolumeClaim verwendet wird
+** dies kann teuer werden
+
+----
+kubectl apply -f nginx.yaml
+----
+
+
+
 
