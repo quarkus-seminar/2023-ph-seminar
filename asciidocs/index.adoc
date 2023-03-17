@@ -699,6 +699,50 @@ kubectl apply -f appsrv.yaml
 kubectl apply -f nginx.yaml
 ----
 
+* Port-Forward 4200:80 im nginx-pod
 
+* http://localhost:4200
+
+==== Zugriff auf Quarkus über nginx
+
+----
+http://localhost:4200/api/q/health
+http://localhost:4200/api/vehicles
+----
+
+
+==== Eröffen einer shell am nginx
+
+----
+kubectl get pods
+----
+
+----
+NAME                        READY   STATUS    RESTARTS   AGE
+appsrv-5f65b54df-w6rtx      1/1     Running   0          27m
+nginx-f88cd74d5-bgcqx       1/1     Running   0          6m36s
+postgres-5468d5c66c-cxq7n   1/1     Running   0          101m
+----
+
+----
+ kubectl exec -it nginx-f88cd74d5-bgcqx -- bash
+----
+
+* Aus Security Gründen wurde der Volume Mount schreibgeschützt
+
+* Daher spielen wir einen Busybox-Job ein
+
+----
+kubectl apply -f busybox-job.yaml
+----
+
+image::busybox-als-pod-und-job.png[]
+
+
+----
+http://localhost:4200/
+----
+
+image::busy-box-web-page.png[]
 
 
