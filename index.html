@@ -559,7 +559,7 @@ pre.rouge .gs {
 <div class="details">
 <span id="author" class="author">Christian Aberger &amp; Thomas W. Stütz</span><br>
 <span id="revnumber">version 1.0.0,</span>
-<span id="revdate">2023-03-16</span>
+<span id="revdate">2023-03-17</span>
 <br><span id="revremark">Softwareentwicklung</span>
 </div>
 <div id="toc" class="toc2">
@@ -575,6 +575,8 @@ pre.rouge .gs {
 <li><a href="#_assertj_db">2.5. AssertJ-DB</a></li>
 <li><a href="#_minikube_installieren">2.6. Minikube installieren</a></li>
 <li><a href="#_docker_image_in_die_ghcr_io_pushen">2.7. Docker-Image in die ghcr.io pushen</a></li>
+<li><a href="#_deployment_eines_vorhandenen_images_ins_minikube">2.8. Deployment eines vorhandenen Images ins Minikube</a></li>
+<li><a href="#_deployment_einer_quarkus_app_ins_minikube">2.9. Deployment einer Quarkus - App ins Minikube</a></li>
 </ul>
 </li>
 </ul>
@@ -730,7 +732,7 @@ echo '[[ $commands[kubectl] ]] &amp;&amp; source &lt;(kubectl completion zsh)' &
 <div class="listingblock">
 <div class="title">Namespace fix einstellen</div>
 <div class="content">
-<pre> kubectl config set-context --current --namespace=demo-namespace
+<pre>kubectl config set-context --current --namespace=demo-namespace
 kubectl get namespaces
 kubectl get pods</pre>
 </div>
@@ -1049,6 +1051,335 @@ latest: digest: sha256:afebab8e3d8cbef70c0632b5a7aa5c003f253d4f4f1ca47fe6b094ef7
 <pre>https://github.com/htl-leonding?tab=packages</pre>
 </div>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Package public setzen
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_docker_image_lokal_löschen"><a class="anchor" href="#_docker_image_lokal_löschen"></a>2.7.6. Docker Image lokal löschen</h4>
+<div class="listingblock">
+<div class="content">
+<pre>docker image rm ghcr.io/htl-leonding/my-busybox</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">output</div>
+<div class="content">
+<pre>Untagged: ghcr.io/htl-leonding/my-busybox:latest
+Untagged: ghcr.io/htl-leonding/my-busybox@sha256:afebab8e3d8cbef70c0632b5a7aa5c003f253d4f4f1ca47fe6b094ef7fe0cd07</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_docker_aus_ghcr_io_pullen_herunterladen"><a class="anchor" href="#_docker_aus_ghcr_io_pullen_herunterladen"></a>2.7.7. Docker aus ghcr.io pullen (herunterladen)</h4>
+<div class="listingblock">
+<div class="content">
+<pre>docker pull ghcr.io/htl-leonding/my-busybox:latest</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">output</div>
+<div class="content">
+<pre>latest: Pulling from htl-leonding/my-busybox
+814c8b675ca3: Pull complete
+Digest: sha256:afebab8e3d8cbef70c0632b5a7aa5c003f253d4f4f1ca47fe6b094ef7fe0cd07
+Status: Downloaded newer image for ghcr.io/htl-leonding/my-busybox:latest
+ghcr.io/htl-leonding/my-busybox:latest</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_deployment_eines_vorhandenen_images_ins_minikube"><a class="anchor" href="#_deployment_eines_vorhandenen_images_ins_minikube"></a>2.8. Deployment eines vorhandenen Images ins Minikube</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Wir brauchen ein yaml-File</p>
+</li>
+</ul>
+</div>
+<details>
+<summary class="title">postgres.yaml</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-setup</span>
+
+<span class="na">data</span><span class="pi">:</span>
+  <span class="na">setup.sql</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">DROP database if exists demo;</span>
+    <span class="s">DROP user if exists demo;</span>
+    <span class="s">CREATE USER demo WITH</span>
+      <span class="s">LOGIN</span>
+      <span class="s">NOSUPERUSER</span>
+      <span class="s">NOCREATEDB</span>
+      <span class="s">NOCREATEROLE</span>
+      <span class="s">INHERIT</span>
+      <span class="s">NOREPLICATION</span>
+      <span class="s">CONNECTION LIMIT -1</span>
+      <span class="s">PASSWORD 'demo';</span>
+
+    <span class="s">CREATE DATABASE demo</span>
+        <span class="s">WITH</span>
+        <span class="s">OWNER = demo</span>
+        <span class="s">ENCODING = 'UTF8'</span>
+        <span class="s">CONNECTION LIMIT = -1;</span>
+  <span class="na">allow-all.sh</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">echo "allow all hosts..."</span>
+    <span class="s">echo "host all  all    0.0.0.0/0  md5" &gt;&gt; /var/lib/postgresql/data/pg_hba.conf</span>
+<span class="s">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgresql-data</span>
+
+  <span class="na">annotations</span><span class="pi">:</span>
+    <span class="na">nfs.io/storage-path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">postgresql-data"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteMany</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">standard</span>
+  <span class="na">resources</span><span class="pi">:</span>
+    <span class="na">requests</span><span class="pi">:</span>
+      <span class="na">storage</span><span class="pi">:</span> <span class="s">100Mi</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Secret</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-admin</span>
+
+<span class="na">type</span><span class="pi">:</span> <span class="s">kubernetes.io/basic-auth</span>
+<span class="na">stringData</span><span class="pi">:</span>
+  <span class="na">username</span><span class="pi">:</span> <span class="s">demo</span>
+  <span class="na">password</span><span class="pi">:</span> <span class="s">demo</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres</span>
+
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">component</span><span class="pi">:</span> <span class="s">postgres</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">component</span><span class="pi">:</span> <span class="s">postgres</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">component</span><span class="pi">:</span> <span class="s">postgres</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">restartPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">30</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">postgres</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">postgres:14</span>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">5432</span>
+              <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">postgres</span>
+          <span class="na">readinessProbe</span><span class="pi">:</span>
+            <span class="na">tcpSocket</span><span class="pi">:</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">5432</span>
+            <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">20</span>
+            <span class="na">periodSeconds</span><span class="pi">:</span> <span class="m">30</span>
+          <span class="na">volumeMounts</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-data</span>
+              <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/postgresql/data</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">setup-scripts</span>
+              <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/docker-entrypoint-initdb.d/setup.sql</span>
+              <span class="na">subPath</span><span class="pi">:</span> <span class="s">setup.sql</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allowall</span>
+              <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/docker-entrypoint-initdb.d/allow-all.sh</span>
+              <span class="na">subPath</span><span class="pi">:</span> <span class="s">allow-all.sh</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">POSTGRES_PASSWORD</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">secretKeyRef</span><span class="pi">:</span>
+                  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-admin</span>
+                  <span class="na">key</span><span class="pi">:</span> <span class="s">password</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-data</span>
+          <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+            <span class="na">claimName</span><span class="pi">:</span> <span class="s">postgresql-data</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">setup-scripts</span>
+          <span class="na">configMap</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-setup</span>
+            <span class="na">items</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">setup.sql</span>
+                <span class="na">path</span><span class="pi">:</span> <span class="s">setup.sql</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allowall</span>
+          <span class="na">configMap</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">postgres-setup</span>
+            <span class="na">items</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">allow-all.sh</span>
+                <span class="na">path</span><span class="pi">:</span> <span class="s">allow-all.sh</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">postgres</span>
+
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">5432</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">5432</span>
+      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">component</span><span class="pi">:</span> <span class="s">postgres</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="listingblock">
+<div class="content">
+<pre>cd k8s
+kubectl apply -f postgres.yaml</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>kontrollieren im minikube dashboard, ob erfolgreich</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>minikube dashboard</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_deployment_einer_quarkus_app_ins_minikube"><a class="anchor" href="#_deployment_einer_quarkus_app_ins_minikube"></a>2.9. Deployment einer Quarkus - App ins Minikube</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Kompilieren und in die Docker Registry (ghcr.io) pushen</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./mvnw clean package -DskipTests -Dquarkus.container-image.push=true</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">output</div>
+<div class="content">
+<pre>[INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Pushed container image ghcr.io/htl-leonding/vehicle (sha256:90f8f348139fb81830d0eef70b8aad9cf8da545f14ed4dd6b191ce0511713116)
+
+[INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 11371ms
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  13.944 s
+[INFO] Finished at: 2023-03-17T08:25:35+01:00
+[INFO] ------------------------------------------------------------------------</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Das Package in den Package Setting public setzen</p>
+</li>
+</ul>
+</div>
+<details>
+<summary class="title">appsrv.yaml erstellen</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="c1"># Quarkus Application Server</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">appsrv</span>
+
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">appsrv</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s">appsrv</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">appsrv</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">ghcr.io/htl-leonding/vehicle:latest</span>
+          <span class="c1"># remove this when stable. Currently we do not take care of version numbers</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">8080</span>
+          <span class="c1">#startupProbe:</span>
+          <span class="c1">#  httpGet:</span>
+          <span class="c1">#    path: /api/q/health</span>
+          <span class="c1">#    port: 8080</span>
+          <span class="c1">#  timeoutSeconds: 5</span>
+          <span class="c1">#  initialDelaySeconds: 15</span>
+          <span class="c1">#readinessProbe:</span>
+          <span class="c1">#  tcpSocket:</span>
+          <span class="c1">#    port: 8080</span>
+          <span class="c1">#  initialDelaySeconds: 5</span>
+          <span class="c1">#  periodSeconds: 10</span>
+          <span class="c1">#livenessProbe:</span>
+          <span class="c1">#  httpGet:</span>
+          <span class="c1">#    path: /api/q/health</span>
+          <span class="c1">#    port: 8080</span>
+          <span class="c1">#  timeoutSeconds: 5</span>
+          <span class="c1">#  initialDelaySeconds: 60</span>
+          <span class="c1">#  periodSeconds: 120</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">appsrv</span>
+
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">8080</span>
+      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">appsrv</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl apply -f appsrv.yaml</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Port Forwarding</div>
+<div class="content">
+<pre>kubectl port-forward postgres-5468d5c66c-78lcv 5432:5432</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Alternative: Verwendung des Shell-Scripts port-forward.sh</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1057,7 +1388,7 @@ latest: digest: sha256:afebab8e3d8cbef70c0632b5a7aa5c003f253d4f4f1ca47fe6b094ef7
 <div id="footer">
 <div id="footer-text">
 Version 1.0.0<br>
-Last updated 2023-03-16 16:32:02 UTC
+Last updated 2023-03-17 07:46:21 UTC
 </div>
 </div>
 </body>
