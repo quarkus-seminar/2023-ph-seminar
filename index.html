@@ -559,8 +559,8 @@ pre.rouge .gs {
 <div class="details">
 <span id="author" class="author">Christian Aberger &amp; Thomas W. Stütz</span><br>
 <span id="revnumber">version 1.0.0,</span>
-<span id="revdate">2023-03-17</span>
-<br><span id="revremark">Softwareentwicklung</span>
+<span id="revdate">2023-03-25</span>
+<br><span id="revremark">15.-17.3.2023, Sperlhof/Windischgarsten</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -582,12 +582,24 @@ pre.rouge .gs {
 <li><a href="#_periodisches_überprüfen_der_healthiness_liveness_probe">2.12. Periodisches Überprüfen der Healthiness (Liveness Probe)</a></li>
 <li><a href="#_installieren_eines_reverse_proxy">2.13. Installieren eines Reverse-Proxy</a></li>
 <li><a href="#_creating_a_linux_executable_without_graalvm_installed">2.14. Creating a Linux executable without GraalVM installed</a></li>
+<li><a href="#_skalieren_der_anzahl_der_pods">2.15. Skalieren der Anzahl der Pods</a></li>
+<li><a href="#_erstellen_eines_ingress_im_minikube">2.16. Erstellen eines Ingress im minikube</a></li>
 </ul>
 </li>
+<li><a href="#_links">3. Links</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="icon"><a class="image" href="https://raw.githubusercontent.com/quarkus-seminar/2023-ph-seminar/main/asciidocs/index.adoc"><i class="fa fa-file-text-o"></i></a></span> ‏ ‏ ‎
+<span class="icon"><a class="image" href="https://github.com/orgs/quarkus-seminar/repositories"><i class="fa fa-github-square"></i></a></span> ‏ ‏ ‎
+<span class="icon"><a class="image" href="https://quarkus-seminar.github.io/2023-ph-seminar/"><i class="fa fa-home"></i></a></span></p>
+</div>
+</div>
+</div>
 <div class="sect1">
 <h2 id="_tag_1"><a class="anchor" href="#_tag_1"></a>1. Tag 1</h2>
 <div class="sectionbody">
@@ -643,6 +655,11 @@ pre.rouge .gs {
 </div>
 <div class="sect2">
 <h3 id="_panache"><a class="anchor" href="#_panache"></a>2.2. Panache</h3>
+<div class="imageblock">
+<div class="content">
+<img src="images/panache-jpa-jdbc.png" alt="panache jpa jdbc">
+</div>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -1572,13 +1589,51 @@ postgres-5468d5c66c-cxq7n   1/1     Running   0          101m</pre>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_skalieren_der_anzahl_der_pods"><a class="anchor" href="#_skalieren_der_anzahl_der_pods"></a>2.15. Skalieren der Anzahl der Pods</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>in den yaml-Files des appsrv und nginx den Wert der <code>replicas</code> auf zB 3 setzen</p>
+</li>
+<li>
+<p>im dashboard unter "Replica Sets" kontrollieren</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_erstellen_eines_ingress_im_minikube"><a class="anchor" href="#_erstellen_eines_ingress_im_minikube"></a>2.16. Erstellen eines Ingress im minikube</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/" class="bare">https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_links"><a class="anchor" href="#_links"></a>3. Links</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://academy.oracle.com/en/oa-web-overview.html" class="bare">https://academy.oracle.com/en/oa-web-overview.html</a></p>
+</li>
+<li>
+<p><a href="https://k3s.io/" class="bare">https://k3s.io/</a></p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 1.0.0<br>
-Last updated 2023-03-17 09:44:40 UTC
+Last updated 2023-03-25 10:08:01 UTC
 </div>
 </div>
 </body>
