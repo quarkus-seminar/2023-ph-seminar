@@ -1,6 +1,6 @@
 = Quarkus-Seminar
 Christian Aberger & Thomas W. Stütz
-1.0.0, {docdate}: Softwareentwicklung
+1.0.0, {docdate}: 15.-17.3.2023, Sperlhof/Windischgarsten
 ifndef::imagesdir[:imagesdir: images]
 //:toc-placement!:  // prevents the generation of the doc at this position, so it can be printed afterwards
 :sourcedir: ../src/main/java
@@ -8,6 +8,14 @@ ifndef::imagesdir[:imagesdir: images]
 :sectnums:    // Nummerierung der Überschriften / section numbering
 :toc: left
 :experimental:
+
+//Need this blank line after ifdef, don't know why...
+ifdef::backend-html5[]
+// https://fontawesome.com/v4.7.0/icons/
+icon:file-text-o[link=https://raw.githubusercontent.com/quarkus-seminar/2023-ph-seminar/main/asciidocs/{docname}.adoc] ‏ ‏ ‎
+icon:github-square[link=https://github.com/orgs/quarkus-seminar/repositories] ‏ ‏ ‎
+icon:home[link=https://quarkus-seminar.github.io/2023-ph-seminar/]
+endif::backend-html5[]
 
 
 == Tag 1
@@ -36,6 +44,9 @@ ifndef::imagesdir[:imagesdir: images]
 
 
 === Panache
+
+image::panache-jpa-jdbc.png[]
+
 
 * https://quarkus.io/guides/hibernate-orm-panache
 
@@ -750,4 +761,22 @@ image::busy-box-web-page.png[]
 ----
 ./mvnw install -Dnative -DskipTests -Dquarkus.native.container-build=true
 ----
+
+
+=== Skalieren der Anzahl der Pods
+
+* in den yaml-Files des appsrv und nginx den Wert der `replicas` auf zB 3 setzen
+* im dashboard unter "Replica Sets" kontrollieren
+
+
+=== Erstellen eines Ingress im minikube
+
+* https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/
+
+
+
+== Links
+
+* https://academy.oracle.com/en/oa-web-overview.html
+* https://k3s.io/
 
