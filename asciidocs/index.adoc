@@ -20,11 +20,10 @@ endif::backend-html5[]
 
 == Tag 1
 
-* https://bit.ly/htl-leonding[^]
-* https://bit.ly/htl-leonding-scripts[^]
-* https://bit.ly/[https://htl-leonding-college.github.io/quarkus-lecture-notes/^]
+* https://htl-leonding-college.github.io/quarkus-lecture-notes/[^]
 * https://github.com/htl-leonding/vehicle[vehicle-github-repo^]
 * https://medium.com/sahibinden-technology/package-by-layer-vs-package-by-feature-7e89cde2ae3a[Package by Layer vs Package by Feature^]
+* http://edufs.edu.htl-leonding.ac.at/~t.stuetz/hugo/2021/01/technology-notes/[^]
 
 
 
